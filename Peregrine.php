@@ -1,7 +1,6 @@
 <?php
-/* 
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * 
  */
 //error_reporting(E_ALL);
 //ini_set('display_errors', true);
@@ -13,78 +12,52 @@
 class CageBase {
 
 	/**
-	 *
-	 * @var <type> 
+	 * @var array Holds the source array for the raw incoming data.
+	 * @access private
 	 */
 	private $_raw;
 
-	/**
-	 *
-	 * @var <type>
-	 */
-	private $_type;
-
 
 	/**
-	 *
-	 * @param <type> $type 
+	 * Loads the incoming source array to the raw private variable.
+	 * 
+	 * @param array $arr
+	 * @access public
 	 */
-	public final function __construct($type = 'post'){
-		$this->_type = strtolower($type);
-		$this->makeCage();
-	}
-
-
-	/**
-	 *
-	 * @param <type> $type 
-	 */
-	private function makeCage(){
-		switch($this->_type){
-			case 'post':
-				$this->makeCage_post();
-				break;
-			case 'get':
-				$this->makeCage_get();
-				break;
+	public final function __construct($arr){
+		if(is_array($arr)){
+			$this->_raw = $arr;
 		}
 	}
 
 
 	/**
-	 * 
-	 */
-	private function makeCage_post(){
-		$this->_raw = $_POST;
-		unset($_POST);
-	}
-
-
-	/**
-	 * 
-	 */
-	private function makeCage_get(){
-		$this->_raw = $_GET;
-		unset($_GET);
-	}
-
-
-	/**
+	 * Determines whethe or not a specific key exists
+	 * in the raw array. If it does it returns its value,
+	 * otherwise it returns false.
 	 *
-	 * @param <type> $key
-	 * @return <type> 
+	 * @param string $key
+	 * @return mixed
+	 * @access public
 	 */
 	private function getKey($key){
 		if(array_key_exists($key, $this->_raw)){
 			return $this->_raw[$key];
 		}
+		return false;
 	}
 
 
+	/***********************************************************
+	 * SANITIZING RETURN METHODS
+	 ***********************************************************/
+
+
 	/**
-	 *
+	 * WARNING: AVOID USING THIS!
 	 * @param <type> $key
 	 * @return <type>
+	 * @access public
 	 */
 	public function getRaw($key = false){
 		return $this->getKey($key);
@@ -120,12 +93,6 @@ class CageBase {
 		return (int) $this->getKey($key);
 	}
 
-//
-//		public function keyExists($key){
-//		if(is_array($this->_source)){
-//			return array_key_exists($key, $this->_source);
-//		}
-//	}
 
 //define ('ISPK_DNS_VALID', '/^(?:[^\W_]((?:[^\W_]|-){0,61}[^\W_])?\.)+[a-zA-Z]{2,6}\.?$/');
 //
@@ -529,36 +496,31 @@ class Peregrine {
 
 	public function init(){
 		// load post, get, session, server, env, cookie, file
+//		$this->_post = $this->sanitize($_POST);
+
+//		$this->_post = Peregrine::sanitize($_POST);
 	}
 
-
-
-	/**
-	 *
-	 * @return CageBase
-	 */
-	static public function post(){
-		return new CageBase('post');
+	public function sanitize( &$var ){
+		$tmp = new CageBase($var);
+		$var= null;
+		return $tmp;
 	}
-
-	/**
-	 *
-	 * @return CageBase 
-	 */
-	static public function get(){
-		return new CageBase('get');
-	}
+//
+//	/**
+//	 *
+//	 * @return CageBase
+//	 */
+//	static public function post(){
+//		return new CageBase('post');
+//	}
+//
+//	/**
+//	 *
+//	 * @return CageBase
+//	 */
+//	static public function get(){
+//		return new CageBase('get');
+//	}
 }
-
-
-// Example uses:
-$peregrine = new Peregrine;
-$peregrine->init();
-
-
-//$test = $peregrine->post->getInt();
-//var_dump($test);
-
-$arr = $peregrine->sanitize( array('test1'=>'itworked') );
-var_dump($arr);
 ?>
