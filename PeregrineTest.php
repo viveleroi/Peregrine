@@ -54,6 +54,120 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(true, $arr->isBetween('test', 3, 5));
 		$this->assertEquals(false, $arr->isBetween('test', 3, 5, false));
 	}
+
+	
+	/**
+	 *
+	 */
+	public function test_isGreaterThan() {
+		$peregrine = new Peregrine;
+		$my_arr = array('test'=>5);
+		$arr = $peregrine->sanitize( $my_arr );
+		$this->assertEquals(false, $arr->isGreaterThan('test', 5));
+		$this->assertEquals(true, $arr->isGreaterThan('test', 3));
+	}
+
+
+	/**
+	 *
+	 */
+	public function test_isLessThan() {
+		$peregrine = new Peregrine;
+		$my_arr = array('test'=>5);
+		$arr = $peregrine->sanitize( $my_arr );
+		$this->assertEquals(false, $arr->isLessThan('test', 4));
+		$this->assertEquals(true, $arr->isLessThan('test', 6));
+	}
+
+
+	/**
+	 *
+	 */
+	public function test_isEmail() {
+		$peregrine = new Peregrine;
+		$my_arr = array('test','test@','test@test','fake@test.com','test+test@test.com');
+		$arr = $peregrine->sanitize( $my_arr );
+		$this->assertEquals(false, $arr->isEmail(0));
+		$this->assertEquals(false, $arr->isEmail(1));
+		$this->assertEquals(false, $arr->isEmail(2));
+		$this->assertEquals(true, $arr->isEmail(3));
+		$this->assertEquals(true, $arr->isEmail(4));
+	}
+
+
+	/**
+	 *
+	 */
+	public function test_isIP() {
+		$peregrine = new Peregrine;
+		$my_arr = array('127.0.0.1','1.2.2.','1.2.F','0.0.0.0');
+		$arr = $peregrine->sanitize( $my_arr );
+		$this->assertEquals(true, $arr->isIP(0));
+		$this->assertEquals(false, $arr->isIP(1));
+		$this->assertEquals(false, $arr->isIP(2));
+		$this->assertEquals(false, $arr->isIP(2));
+	}
+
+
+	/**
+	 *
+	 */
+	public function test_isInArray() {
+		$peregrine = new Peregrine;
+		$my_arr = array('apple');
+		$arr = $peregrine->sanitize( $my_arr );
+		$this->assertEquals(true, $arr->isInArray(0, array('apple', 'banana')));
+		$this->assertEquals(NULL, $arr->isInArray(0, 'hello'));
+	}
+
+
+	/**
+	 *
+	 */
+	public function test_isPhone() {
+		$peregrine = new Peregrine;
+		$my_arr = array('503AAAA','5031239999');
+		$arr = $peregrine->sanitize( $my_arr );
+		$this->assertEquals(false, $arr->isPhone(0));
+		$this->assertEquals(true, $arr->isPhone(1));
+	}
+
+
+	/**
+	 *
+	 */
+	public function test_isCreditCard() {
+		$peregrine = new Peregrine;
+		$my_arr = array('4111111111111111','4111-1111-1111-1111');
+		$arr = $peregrine->sanitize( $my_arr );
+		$this->assertEquals(true, $arr->isCreditCard(0));
+		$this->assertEquals(true, $arr->isCreditCard(1));
+	}
+
+
+	/**
+	 *
+	 */
+	public function test_isUri() {
+		$peregrine = new Peregrine;
+		$my_arr = array(
+						'http://www.google.com',
+						'ftp://user@google.com',
+						'https://site.com',
+						'bob',
+						'http://127.0.0.1:80/users/~bob');
+		$arr = $peregrine->sanitize( $my_arr );
+		$this->assertEquals(true, $arr->isUri(0));
+		$this->assertEquals(true, $arr->isUri(1));
+		$this->assertEquals(true, $arr->isUri(2));
+		$this->assertEquals(false, $arr->isUri(3));
+		$this->assertEquals(true, $arr->isUri(4));
+	}
+
+
+	/***********************************************************
+	 * SANITIZING RETURN METHOD TESTS
+	 ***********************************************************/
 	
 
 	/**
@@ -147,42 +261,42 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 	}
 
 
-//	/**
-//	 *
-//	 */
-//	public function test_getDigits() {
-//		$peregrine = new Peregrine;
-//		$my_arr = array('test'=>'ABC10.123');
-//		$arr = $peregrine->sanitize( $my_arr );
-//		$this->assertEquals('10123', $arr->getDigits('test'));
-//	}
-//
-//
-//	/**
-//	 *
-//	 */
-//	public function test_isDigits() {
-//		$peregrine = new Peregrine;
-//		$my_arr = array('test'=>ALL_CHAR_STRING,'test2'=>123);
-//		$arr = $peregrine->sanitize( $my_arr );
-//		$this->assertEquals(false, $arr->isDigits('test'));
-//		$this->assertEquals(true, $arr->isDigits('test2'));
-//
-//	}
-//
-//
-//	/**
-//	 *
-//	 */
-//	public function test_getFloat() {
-//		$peregrine = new Peregrine;
-//		$my_arr = array('test'=>'AB10.123','test2'=>123,'test3'=>123.00,'test4'=>127.27);
-//		$arr = $peregrine->sanitize( $my_arr );
-//		$this->assertEquals('10.123', $arr->getFloat('test'));
-//		$this->assertEquals('123', $arr->getFloat('test2'));
-//		$this->assertEquals('123.00', $arr->getFloat('test3'));
-//		$this->assertEquals('127.27', $arr->getFloat('test4'));
-//	}
+	/**
+	 *
+	 */
+	public function test_getDigits() {
+		$peregrine = new Peregrine;
+		$my_arr = array('test'=>'ABC10.123');
+		$arr = $peregrine->sanitize( $my_arr );
+		$this->assertEquals('10123', $arr->getDigits('test'));
+	}
+
+
+	/**
+	 *
+	 */
+	public function test_isDigits() {
+		$peregrine = new Peregrine;
+		$my_arr = array('test'=>ALL_CHAR_STRING,'test2'=>123);
+		$arr = $peregrine->sanitize( $my_arr );
+		$this->assertEquals(false, $arr->isDigits('test'));
+		$this->assertEquals(true, $arr->isDigits('test2'));
+
+	}
+
+
+	/**
+	 *
+	 */
+	public function test_getFloat() {
+		$peregrine = new Peregrine;
+		$my_arr = array('test'=>'AB10.123','test2'=>123,'test3'=>123.00,'test4'=>127.27);
+		$arr = $peregrine->sanitize( $my_arr );
+		$this->assertEquals('10.123', $arr->getFloat('test'));
+		$this->assertEquals('123', $arr->getFloat('test2'));
+		$this->assertEquals('123.00', $arr->getFloat('test3'));
+		$this->assertEquals('127.27', $arr->getFloat('test4'));
+	}
 
 
 	/**
@@ -194,6 +308,30 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 		$arr = $peregrine->sanitize( $my_arr );
 		$this->assertEquals(false, $arr->isFloat('test'));
 		$this->assertEquals(true, $arr->isFloat('test2'));
+	}
+
+
+	/**
+	 *
+	 */
+	public function test_getZip() {
+		$peregrine = new Peregrine;
+		$my_arr = array('12345','AAA12345');
+		$arr = $peregrine->sanitize( $my_arr );
+		$this->assertEquals('12345', $arr->getZip(0));
+		$this->assertEquals('12345', $arr->getZip(1));
+	}
+
+	
+	/**
+	 *
+	 */
+	public function test_isZip() {
+		$peregrine = new Peregrine;
+		$my_arr = array('12345','AAA12345');
+		$arr = $peregrine->sanitize( $my_arr );
+		$this->assertEquals(true, $arr->isZip(0));
+		$this->assertEquals(false, $arr->isZip(1));
 	}
 }
 ?>
