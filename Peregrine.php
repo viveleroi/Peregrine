@@ -48,9 +48,28 @@ class CageBase {
 	}
 
 
-	/***********************************************************
-	 * SANITIZING RETURN METHODS
-	 ***********************************************************/
+	/**
+	 *
+	 * @param <type> $method
+	 * @param <type> $args
+	 * @return <type> mixed
+	 */
+	public function __call($method, $args){
+
+		// $key should be first arg
+		$key = false;
+		if(array_key_exists(0, $args)){
+			$key = $args[0];
+		}
+
+		if($key && strpos($method, 'is') !== false){
+			$real_method = str_replace('is', 'get', $method);
+			if(method_exists($this, $real_method)){
+				return $this->{$real_method}($key) === $this->getRaw($key);
+			}
+		}
+		return NULL;
+	}
 
 
 	/**
@@ -64,6 +83,47 @@ class CageBase {
 	}
 
 
+
+	/***********************************************************
+	 * CUSTOM DATA CHECK METHODS
+	 ***********************************************************/
+
+	 /**
+	  *
+	  * @param <type> $value
+	  * @return <type> 
+	  */
+	public function isEmpty($key){
+		$val = $this->getRaw($key);
+		return empty($val);
+	}
+
+
+	/**
+	 *
+	 * @param <type> $val
+	 * @param <type> $min
+	 * @param <type> $max
+	 * @param <type> $inc
+	 * @return <type> 
+	 */
+	public function isBetween($key, $min, $max, $inc = true){
+		$val = $this->getRaw($key);
+		if ($val > $min && $val < $max) {
+			return true;
+		}
+		if ($inc && $val >= $min && $val <= $max) {
+			return true;
+		}
+		return false;
+	}
+
+
+	/***********************************************************
+	 * SANITIZING RETURN METHODS
+	 ***********************************************************/
+
+
 	/**
 	 *
 	 * @param <type> $key
@@ -72,7 +132,7 @@ class CageBase {
 	public function getAlpha($key = false){
 		return preg_replace('/[^[:alpha:]]/', '', $this->getKey($key));
 	}
-
+	
 
 	/**
 	 *
@@ -91,6 +151,34 @@ class CageBase {
 	 */
 	public function getInt($key = false){
 		return (int) $this->getKey($key);
+	}
+
+
+	/**
+	 *
+	 * @param <type> $key
+	 * @return <type>
+	 */
+	public function getDigits($key = false){
+		// We need to mimic the type back to the user that they gave us
+		$type = gettype($this->getKey($key));
+		$clean = preg_replace('/[^\d]/', '', $this->getKey($key));
+		settype($clean, $type);
+		return $clean;
+	}
+
+
+	/**
+	 *
+	 * @param <type> $key
+	 * @return <type>
+	 */
+	public function getFloat($key = false){
+		// We need to mimic the type back to the user that they gave us
+		$type = gettype($this->getKey($key));
+		$clean = preg_replace('/[^\d\.]/', '', $this->getKey($key));
+		settype($clean, $type);
+		return $clean;
 	}
 
 
@@ -151,65 +239,6 @@ class CageBase {
 //	}
 //
 //
-//	static function isNotEmpty($value)
-//	{
-//		return !empty($value);
-//	}
-//
-//		static function isEmpty($value)
-//	{
-//		return empty($value);
-//	}
-//
-//		static function getAlpha($value)
-//	{
-//		if (is_array($value)) {
-//			return Inspekt::_walkArray($value, 'getAlpha');
-//		} else {
-//			return preg_replace('/[^[:alpha:]]/', '', $value);
-//		}
-//	}
-//
-//
-//		static function getAlnum($value)
-//	{
-//		if (is_array($value)) {
-//			return Inspekt::_walkArray($value, 'getAlnum');
-//		} else {
-//			return preg_replace('/[^[:alnum:]]/', '', $value);
-//		}
-//	}
-//
-//
-//		static function getDigits($value)
-//	{
-//		if (is_array($value)) {
-//			return Inspekt::_walkArray($value, 'getDigits');
-//		} else {
-//			return preg_replace('/[^\d]/', '', $value);
-//		}
-//	}
-//
-//
-//		static function getFloat($value)
-//	{
-//		if (is_array($value)) {
-//			return Inspekt::_walkArray($value, 'getFloat');
-//		} else {
-//			return preg_replace('/[^\d\.]/', '', $value);
-//		}
-//	}
-//
-//
-//		static function getInt($value)
-//	{
-//		if (is_array($value)) {
-//			return Inspekt::_walkArray($value, 'getInt');
-//		} else {
-//			return (int) $value;
-//		}
-//	}
-//
 //
 //		static function getDate($value)
 //	{
@@ -218,34 +247,6 @@ class CageBase {
 //		} else {
 //			return preg_replace('/[^0-9-]/', '', $value);
 //		}
-//	}
-//
-//
-//		static function isAlnum($value)
-//	{
-//		return ctype_alnum($value);
-//	}
-//
-//		static function isAlpha($value)
-//	{
-//		return ctype_alpha($value);
-//	}
-//
-//
-//		static function isBetween($value, $min, $max, $inc = TRUE)
-//	{
-//		if ($value > $min &&
-//		$value < $max) {
-//			return TRUE;
-//		}
-//
-//		if ($inc &&
-//		$value >= $min &&
-//		$value <= $max) {
-//			return TRUE;
-//		}
-//
-//		return FALSE;
 //	}
 //
 //
@@ -285,26 +286,9 @@ class CageBase {
 //	}
 //
 //
-//		static function isDigits($value)
-//	{
-//		return ctype_digit((string) $value);
-//	}
-//
-//
 //		static function isEmail($value)
 //	{
 //		return (bool) preg_match(ISPK_EMAIL_VALID, $value);
-//	}
-//
-//
-//		static function isFloat($value)
-//	{
-//		$locale = localeconv();
-//
-//		$value = str_replace($locale['decimal_point'], '.', $value);
-//		$value = str_replace($locale['thousands_sep'], '', $value);
-//
-//		return (strval(floatval($value)) == $value);
 //	}
 //
 //
@@ -319,16 +303,6 @@ class CageBase {
 //		return ctype_xdigit($value);
 //	}
 //
-//
-//		static function isInt($value)
-//	{
-//		$locale = localeconv();
-//
-//		$value = str_replace($locale['decimal_point'], '.', $value);
-//		$value = str_replace($locale['thousands_sep'], '', $value);
-//
-//		return (strval(intval($value)) == $value);
-//	}
 //
 //		static function isIp($value)
 //	{
