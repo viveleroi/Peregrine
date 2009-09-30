@@ -32,7 +32,7 @@ class CageBase {
 
 	/**
 	 * Loads the incoming source array to the raw private variable.
-	 * 
+	 *
 	 * @param array $arr
 	 * @access public
 	 */
@@ -99,12 +99,32 @@ class CageBase {
 
 	/**
 	 * WARNING: AVOID USING THIS!
+	 * Returns the raw, unfiltered value from the $key. Use this only
+	 * if the existing filters don't apply. Please recommend new
+	 * filters or submit patches through github.
+	 *
 	 * @param string $key
 	 * @return mixed
 	 * @access public
 	 */
 	public function getRaw($key = false){
 		return $this->getKey($key);
+	}
+
+
+	/**
+	 * WARNING: AVOID USING THIS!
+	 * Returns the origin superglobal array. It is not recommended
+	 * you use this, as it does not allow you to use the class
+	 * filtering functions.
+	 *
+	 * @param string $var
+	 * @return array
+	 */
+	public function getRawSource($var){
+		if(in_array($var, array('post','get','session','cookie','server','env','files'))){
+			return $this->{$var};
+		}
 	}
 
 
@@ -232,7 +252,7 @@ class CageBase {
 
 	/**
 	 * Determines whether or not a string is a valid IP address.
-	 * 
+	 *
 	 * @param string $key
 	 * @return boolean
 	 */
@@ -262,7 +282,7 @@ class CageBase {
 	/**
 	 * Determines if the value is a valid phone number. Currently, only US
 	 * phone numbers are supported.
-	 * 
+	 *
 	 * @param string $key
 	 * @param string $country
 	 * @return boolean
@@ -337,7 +357,7 @@ class CageBase {
 	 *
 	 * @param string $key
 	 * @param <type> $type
-	 * @return <type> 
+	 * @return <type>
 	 */
 	public function isCreditCard($key, $type = NULL){
 
@@ -361,7 +381,7 @@ class CageBase {
 
 		return ($mod == $value[$length - 1]);
 	}
-	
+
 
 	/**
 	 * Determines if the string is a valid web address.
@@ -385,7 +405,7 @@ class CageBase {
 		$regex .= '(\?[^#]*)?';							// query
 		$regex .= '(#([-a-z0-9_]*))?';					// anchor (fragment)
 		$regex .= '$&i';
-			
+
 		$res = preg_match($regex, $this->getRaw($key), $matches);
 		return (bool) $res;
 
@@ -399,7 +419,7 @@ class CageBase {
 
 	/**
 	 * Returns a string of only alphabetical characters.
-	 * 
+	 *
 	 * @param string $key
 	 * @param string $default
 	 * @return string
@@ -410,7 +430,7 @@ class CageBase {
 		}
 		return $default;
 	}
-	
+
 
 	/**
 	 * Returns a string of alphanumeric characters.
@@ -505,7 +525,7 @@ class CageBase {
 
 
 /**
- * 
+ *
  */
 class Peregrine {
 
@@ -573,6 +593,21 @@ class Peregrine {
 
 
 	/**
+	 * Returns the origin superglobal array. It is not recommended
+	 * you use this, as it does not allow you to use the class
+	 * filtering functions.
+	 *
+	 * @param string $var
+	 * @return array
+	 */
+	public function getRawSource($var){
+		if(in_array($var, array('post','get','session','cookie','server','env','files'))){
+			return $this->{$var};
+		}
+	}
+
+
+	/**
 	 * Cages for the $_GET superglobal.
 	 */
 	private function get_cage(){
@@ -602,10 +637,26 @@ class Peregrine {
 		// possible way to regenerate session:
 		// session_write_close / session_start();
 
-		$tmp = $this->sanitize($_SESSION);
+//		$tmp = $this->sanitize($_SESSION);
+		// don't call sanitize because it nulls out SESSION
+		$tmp = new CageBase($_SESSION);
 //		$GLOBALS['HTTP_SESSION_VARS'] = NULL;
-//		$this->_session = $tmp;
+		$this->session = $tmp;
 	}
+
+		/**
+		 * Refreshes the session cage after writing to it
+		 * @todo this is only temporary until we resolve the session
+		 * refreshing issue noted above.
+		 * @param <type> $type
+		 */
+		public function refreshCage($type){
+			switch($type){
+				case 'session':
+					$this->session_cage();
+					break;
+			}
+		}
 
 
 	/**
@@ -616,7 +667,7 @@ class Peregrine {
 		$GLOBALS['HTTP_COOKIE_VARS'] = NULL;
 		$this->cookie = $tmp;
 	}
-	
+
 
 	/**
 	 * Cages for the $_SERVER superglobal.
