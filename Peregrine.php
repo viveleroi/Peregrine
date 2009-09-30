@@ -29,6 +29,7 @@ class CageBase {
 		}
 	}
 
+// @keyexists
 
 	/**
 	 * Determines whethe or not a specific key exists
@@ -81,6 +82,7 @@ class CageBase {
 		return $this->getKey($key);
 	}
 
+	// @todo getRawSource();
 
 	/***********************************************************
 	 * CUSTOM DATA CHECK METHODS
@@ -95,6 +97,45 @@ class CageBase {
 		$val = $this->getRaw($key);
 		return empty($val);
 	}
+
+//		function isEmpty($key, $count_as_empty = false)
+//	{
+//
+//		// if key does not exist
+//		if (!$this->keyExists($key)) {
+//			return true;
+//		} else {
+//
+//			$val = $this->_getValue($key);
+//
+//			// replace any extra "count as empty" chars
+//			if($count_as_empty){
+//				$val = str_replace($count_as_empty, '', $val);
+//			}
+//
+//			// the key is set, so we do need to process it no matter what
+//			return Inspekt::isEmpty($val);
+//
+//		}
+//	}
+
+
+//	function isSetAndEmpty($key)
+//	{
+//		if ($this->keyExists($key)) {
+//			return Inspekt::isEmpty($this->_getValue($key));
+//		}
+//		return false;
+//	}
+
+//
+//	function isSetAndNotEmpty($key)
+//	{
+//		if ($this->keyExists($key)) {
+//			return Inspekt::isNotEmpty($this->_getValue($key));
+//		}
+//		return false;
+//	}
 
 
 	/**
@@ -316,6 +357,81 @@ class CageBase {
 	}
 
 
+	/**
+     * Returns TRUE if value is a valid hostname, FALSE otherwise.
+     * Depending upon the value of $allow, Internet domain names, IP
+     * addresses, and/or local network names are considered valid.
+     * The default is HOST_ALLOW_ALL, which considers all of the
+     * above to be valid.
+     *
+     * @param mixed $value
+     * @param integer $allow bitfield for ISPK_HOST_ALLOW_DNS, ISPK_HOST_ALLOW_IP, ISPK_HOST_ALLOW_LOCAL
+     * @return boolean
+     *
+     * @tag validator
+     * @static
+     */
+	 //define ('ISPK_HOST_ALLOW_DNS',   1);
+	 //define ('ISPK_HOST_ALLOW_ALL',   7);
+	 //define ('ISPK_HOST_ALLOW_IP',    2);
+	 //define ('ISPK_HOST_ALLOW_LOCAL', 4);
+	 //define ('ISPK_URI_ALLOW_COMMON', 1);
+	 //define ('ISPK_DNS_VALID', '/^(?:[^\W_]((?:[^\W_]|-){0,61}[^\W_])?\.)+[a-zA-Z]{2,6}\.?$/');
+//	static function isHostname($value, $allow = ISPK_HOST_ALLOW_ALL)
+//	{
+//		if (!is_numeric($allow) || !is_int($allow)) {
+//			user_error('Illegal value for $allow; expected an integer', E_USER_WARNING);
+//		}
+//
+//		if ($allow < ISPK_HOST_ALLOW_DNS || ISPK_HOST_ALLOW_ALL < $allow) {
+//			user_error('Illegal value for $allow; expected integer between ' . ISPK_HOST_ALLOW_DNS . ' and ' . ISPK_HOST_ALLOW_ALL, E_USER_WARNING);
+//		}
+//
+//		// determine whether the input is formed as an IP address
+//		$status = self::isIp($value);
+//
+//		// if the input looks like an IP address
+//		if ($status) {
+//			// if IP addresses are not allowed, then fail validation
+//			if (($allow & ISPK_HOST_ALLOW_IP) == 0) {
+//				return FALSE;
+//			}
+//
+//			// IP passed validation
+//			return TRUE;
+//		}
+//
+//		// check input against domain name schema
+//		$status = @preg_match('/^(?:[^\W_]((?:[^\W_]|-){0,61}[^\W_])?\.)+[a-zA-Z]{2,6}\.?$/', $value);
+//		if ($status === false) {
+//			user_error('Internal error: DNS validation failed', E_USER_WARNING);
+//		}
+//
+//		// if the input passes as an Internet domain name, and domain names are allowed, then the hostname
+//		// passes validation
+//		if ($status == 1 && ($allow & ISPK_HOST_ALLOW_DNS) != 0) {
+//			return TRUE;
+//		}
+//
+//		// if local network names are not allowed, then fail validation
+//		if (($allow & ISPK_HOST_ALLOW_LOCAL) == 0) {
+//			return FALSE;
+//		}
+//
+//		// check input against local network name schema; last chance to pass validation
+//		$status = @preg_match('/^(?:[^\W_](?:[^\W_]|-){0,61}[^\W_]\.)*(?:[^\W_](?:[^\W_]|-){0,61}[^\W_])\.?$/',
+//		$value);
+//		if ($status === FALSE) {
+//			user_error('Internal error: local network name validation failed', E_USER_WARNING);
+//		}
+//
+//		if ($status == 0) {
+//			return FALSE;
+//		} else {
+//			return TRUE;
+//		}
+//	}
+
 	/***********************************************************
 	 * SANITIZING RETURN METHODS
 	 ***********************************************************/
@@ -405,49 +521,142 @@ class CageBase {
  */
 class Peregrine {
 
-	private $_post;
-	private $_get;
-	private $_session;
-	private $_env;
-	private $_files;
-	private $_cookie;
+	/**
+	 *
+	 * @var <type>
+	 */
+	public $post;
+
+	/**
+	 *
+	 * @var <type>
+	 */
+	public $get;
+
+	/**
+	 *
+	 * @var <type>
+	 */
+	public $session;
+
+	/**
+	 *
+	 * @var <type>
+	 */
+	public $env;
+
+	/**
+	 *
+	 * @var <type>
+	 */
+	public $files;
+
+	/**
+	 *
+	 * @var <type>
+	 */
+	public $cookie;
+
+	/**
+	 *
+	 * @var <type>
+	 */
+	public $server;
 
 
+	/**
+	 * 
+	 */
 	public function init(){
-		// load post, get, session, server, env, cookie, file
-//		$this->_post = $this->sanitize($_POST);
-
-//		$this->_post = Peregrine::sanitize($_POST);
-
-//$GLOBALS['HTTP_SERVER_VARS'] = NULL;
-//$GLOBALS['HTTP_GET_VARS'] = NULL;
-//$GLOBALS['HTTP_POST_VARS'] = NULL;
-//$GLOBALS['HTTP_COOKIE_VARS'] = NULL;
-//$GLOBALS['HTTP_ENV_VARS'] = NULL;
-//$GLOBALS['HTTP_POST_FILES'] = NULL;
-//$GLOBALS['HTTP_SESSION_VARS'] = NULL; (commented)
+		$this->get_cage();
+		$this->post_cage();
+//		$this->session_cage();
+		$this->cookie_cage();
+		$this->server_cage();
+		$this->env_cage();
+		$this->files_cage();
 	}
 
+
+	/**
+	 *
+	 * @param <type> $var
+	 * @return <type> 
+	 */
 	public function sanitize( &$var ){
 		$tmp = new CageBase($var);
-		$var= null;
+		$var = null;
 		return $tmp;
 	}
-//
-//	/**
-//	 *
-//	 * @return CageBase
-//	 */
-//	static public function post(){
-//		return new CageBase('post');
+
+
+	/**
+	 *
+	 */
+	private function get_cage(){
+		$tmp = $this->sanitize($_GET);
+		$GLOBALS['HTTP_GET_VARS'] = NULL;
+		$this->get = $tmp;
+	}
+
+
+	/**
+	 *
+	 */
+	private function post_cage(){
+		$tmp = $this->sanitize($_POST);
+		$GLOBALS['HTTP_POST_VARS'] = NULL;
+		$this->post = $tmp;
+	}
+
+
+	/**
+	 * @todo detect session update
+	 */
+//	private function session_cage(){
+//		$tmp = $this->sanitize($_SESSION);
+//		$GLOBALS['HTTP_SESSION_VARS'] = NULL;
+//		$this->_session = $tmp;
 //	}
-//
-//	/**
-//	 *
-//	 * @return CageBase
-//	 */
-//	static public function get(){
-//		return new CageBase('get');
-//	}
+
+
+	/**
+	 *
+	 */
+	private function cookie_cage(){
+		$tmp = $this->sanitize($_COOKIE);
+		$GLOBALS['HTTP_COOKIE_VARS'] = NULL;
+		$this->cookie = $tmp;
+	}
+	
+
+	/**
+	 *
+	 */
+	private function server_cage(){
+		$tmp = $this->sanitize($_SERVER);
+		$GLOBALS['HTTP_SERVER_VARS'] = NULL;
+		$this->server = $tmp;
+	}
+
+
+	/**
+	 *
+	 */
+	private function env_cage(){
+		$tmp = $this->sanitize($_ENV);
+		$GLOBALS['HTTP_ENV_VARS'] = NULL;
+		$this->env = $tmp;
+	}
+
+
+	/**
+	 *
+	 */
+	private function files_cage(){
+		$tmp = $this->sanitize($_FILES);
+		$GLOBALS['HTTP_POST_FILES'] = NULL;
+		$this->files = $tmp;
+	}
 }
 ?>

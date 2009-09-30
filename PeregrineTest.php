@@ -333,5 +333,22 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(true, $arr->isZip(0));
 		$this->assertEquals(false, $arr->isZip(1));
 	}
+
+
+	/***********************************************************
+	 * SUPERGLOBAL CAGE TESTS
+	 ***********************************************************/
+
+
+	/**
+	 *
+	 */
+	public function test_serveCage() {
+		$peregrine = new Peregrine;
+		$peregrine->init();
+
+		$this->assertEquals(NULL, $_SERVER);
+		$this->assertEquals(true, is_string($peregrine->server->getRaw('HOSTNAME')));
+	}
 }
 ?>
