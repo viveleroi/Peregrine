@@ -40,8 +40,36 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 		$arr = $peregrine->sanitize( $my_arr );
 		$this->assertEquals(true, $arr->isEmpty('test'));
 		$this->assertEquals(false, $arr->isEmpty('test2'));
+		$this->assertEquals(true, $arr->isEmpty('fake'));
+		$this->assertEquals(true, $arr->isEmpty('test2','full')); // count "full" as empty
 	}
 
+
+	/**
+	 *
+	 */
+	public function test_isSetAndNotEmpty() {
+		$peregrine = new Peregrine;
+		$my_arr = array('test'=>0,'test2'=>'notempty');
+		$arr = $peregrine->sanitize( $my_arr );
+		$this->assertEquals(false, $arr->isSetAndNotEmpty('test'));
+		$this->assertEquals(true, $arr->isSetAndNotEmpty('test2'));
+		$this->assertEquals(false, $arr->isSetAndNotEmpty('test3'));
+	}
+
+
+	/**
+	 *
+	 */
+	public function test_isSetAndEmpty() {
+		$peregrine = new Peregrine;
+		$my_arr = array('test'=>0,'test2'=>'notempty');
+		$arr = $peregrine->sanitize( $my_arr );
+		$this->assertEquals(true, $arr->isSetAndEmpty('test'));
+		$this->assertEquals(false, $arr->isSetAndEmpty('test2'));
+		$this->assertEquals(false, $arr->isSetAndEmpty('test3'));
+	}
+	
 
 	/**
 	 *
@@ -61,10 +89,11 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function test_isGreaterThan() {
 		$peregrine = new Peregrine;
-		$my_arr = array('test'=>5);
+		$my_arr = array('test'=>5,'test2'=>5.56);
 		$arr = $peregrine->sanitize( $my_arr );
 		$this->assertEquals(false, $arr->isGreaterThan('test', 5));
 		$this->assertEquals(true, $arr->isGreaterThan('test', 3));
+		$this->assertEquals(true, $arr->isGreaterThan('test2', 5));
 	}
 
 
@@ -73,10 +102,11 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function test_isLessThan() {
 		$peregrine = new Peregrine;
-		$my_arr = array('test'=>5);
+		$my_arr = array('test'=>5,'test2'=>4.99);
 		$arr = $peregrine->sanitize( $my_arr );
 		$this->assertEquals(false, $arr->isLessThan('test', 4));
 		$this->assertEquals(true, $arr->isLessThan('test', 6));
+		$this->assertEquals(true, $arr->isLessThan('test2', 5));
 	}
 
 
@@ -178,6 +208,7 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 		$my_arr = array('test'=>ALL_CHAR_STRING);
 		$arr = $peregrine->sanitize( $my_arr );
 		$this->assertEquals('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', $arr->getAlpha('test'));
+		$this->assertEquals('default', $arr->getAlpha('nonexist-key', 'default'));
 	}
 
 
@@ -190,6 +221,7 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 		$arr = $peregrine->sanitize( $my_arr );
 		$this->assertEquals(false, $arr->isAlpha('test'));
 		$this->assertEquals(true, $arr->isAlpha('test2'));
+		$this->assertEquals('default', $arr->isAlpha('nonexist-key', 'default'));
 	}
 
 	
@@ -235,6 +267,7 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 		$my_arr = array('test'=>123);
 		$arr = $peregrine->sanitize( $my_arr );
 		$this->assertEquals(123, $arr->getInt('test'));
+		$this->assertEquals(0, $arr->getInt('nonexist-key', 0));
 	}
 
 
@@ -269,6 +302,7 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 		$my_arr = array('test'=>'ABC10.123');
 		$arr = $peregrine->sanitize( $my_arr );
 		$this->assertEquals('10123', $arr->getDigits('test'));
+		$this->assertEquals(0, $arr->getDigits('nonexist-key', 0));
 	}
 
 
@@ -281,7 +315,6 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 		$arr = $peregrine->sanitize( $my_arr );
 		$this->assertEquals(false, $arr->isDigits('test'));
 		$this->assertEquals(true, $arr->isDigits('test2'));
-
 	}
 
 
@@ -296,6 +329,7 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('123', $arr->getFloat('test2'));
 		$this->assertEquals('123.00', $arr->getFloat('test3'));
 		$this->assertEquals('127.27', $arr->getFloat('test4'));
+		$this->assertEquals(0, $arr->getFloat('nonexist-key', 0));
 	}
 
 
@@ -320,6 +354,7 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 		$arr = $peregrine->sanitize( $my_arr );
 		$this->assertEquals('12345', $arr->getZip(0));
 		$this->assertEquals('12345', $arr->getZip(1));
+		$this->assertEquals('12345', $arr->getFloat('nonexist-key', '12345'));
 	}
 
 	

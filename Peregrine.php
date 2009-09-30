@@ -1,9 +1,22 @@
 <?php
 /**
- * @package Peregrine
- * @author Michael Botsko, Trellis Development, LLC
- * @license Mozilla Public License, 1.1
+ * @package  Peregrine
+ * @author   Michael Botsko, Trellis Development, LLC
+ * @license  Mozilla Public License, 1.1
+ *
+ * Peregrine is a class that aims to improve PHP superglobal security
+ * by transferring the raw incoming values to private member variables.
+ * You may then access the data using a wide array of higher security
+ * filtering functions.
+ *
+ * This class was partially inspired by Inspekt by Ed Finkler and Chris Shifflet,
+ * two folks who have contributed greatly to the php community. In order to meet
+ * some custom needs for both single projects and for the Aspen Framework.
  */
+
+// @todo getRawSource();
+// @todo getDate
+// @todo get name: allow alpha, space, hyphen
 
 /**
  * @package Peregrine
@@ -29,10 +42,19 @@ class CageBase {
 		}
 	}
 
-// @keyexists
 
 	/**
-	 * Determines whethe or not a specific key exists
+	 * Determines whether or not a key exists
+	 * @param string $key
+	 * @return boolean
+	 */
+	public function keyExists($key){
+		return array_key_exists($key, $this->_raw);
+	}
+
+
+	/**
+	 * Determines whether or not a specific key exists
 	 * in the raw array. If it does it returns its value,
 	 * otherwise it returns false.
 	 *
@@ -41,7 +63,7 @@ class CageBase {
 	 * @access public
 	 */
 	private function getKey($key){
-		if(array_key_exists($key, $this->_raw)){
+		if($this->keyExists($key)){
 			return $this->_raw[$key];
 		}
 		return false;
@@ -49,10 +71,13 @@ class CageBase {
 
 
 	/**
+	 * Handles incoming method calls for undefined is___
+	 * functions. If not method defined it uses the
+	 * get___ equiv in it's place for matching.
 	 *
-	 * @param <type> $method
-	 * @param <type> $args
-	 * @return <type> mixed
+	 * @param string $method
+	 * @param array $args
+	 * @return boolean
 	 */
 	public function __call($method, $args){
 
@@ -75,79 +100,86 @@ class CageBase {
 	/**
 	 * WARNING: AVOID USING THIS!
 	 * @param string $key
-	 * @return <type>
+	 * @return mixed
 	 * @access public
 	 */
 	public function getRaw($key = false){
 		return $this->getKey($key);
 	}
 
-	// @todo getRawSource();
 
 	/***********************************************************
 	 * CUSTOM DATA CHECK METHODS
 	 ***********************************************************/
 
-	 /**
-	  *
-	  * @param <type> $value
-	  * @return <type> 
-	  */
-	public function isEmpty($key){
-		$val = $this->getRaw($key);
-		return empty($val);
+
+	/**
+	 * Determines whether or not a value is empty. You may provide
+	 * an array of additional characters that should be counted as
+	 * empty values.
+	 *
+	 * Empty returns true if the key does not exist at all.
+	 *
+	 * For example empty dates may contain 0,:,-,/
+	 *
+	 * @param string $key
+	 * @param mixed $count_as_empty
+	 * @return boolean
+	 */
+	public function isEmpty($key, $count_as_empty = false){
+		if (!$this->keyExists($key)) {
+			return true;
+		} else {
+			$val = $this->getRaw($key);
+			$val = $count_as_empty ? str_replace($count_as_empty, '', $val) : $val;
+			return empty($val);
+		}
 	}
-
-//		function isEmpty($key, $count_as_empty = false)
-//	{
-//
-//		// if key does not exist
-//		if (!$this->keyExists($key)) {
-//			return true;
-//		} else {
-//
-//			$val = $this->_getValue($key);
-//
-//			// replace any extra "count as empty" chars
-//			if($count_as_empty){
-//				$val = str_replace($count_as_empty, '', $val);
-//			}
-//
-//			// the key is set, so we do need to process it no matter what
-//			return Inspekt::isEmpty($val);
-//
-//		}
-//	}
-
-
-//	function isSetAndEmpty($key)
-//	{
-//		if ($this->keyExists($key)) {
-//			return Inspekt::isEmpty($this->_getValue($key));
-//		}
-//		return false;
-//	}
-
-//
-//	function isSetAndNotEmpty($key)
-//	{
-//		if ($this->keyExists($key)) {
-//			return Inspekt::isNotEmpty($this->_getValue($key));
-//		}
-//		return false;
-//	}
 
 
 	/**
+	 * Only runs an empty check if the key has been set.
 	 *
-	 * @param <type> $key
-	 * @param <type> $min
-	 * @param <type> $max
-	 * @param <type> $inc
-	 * @return <type> 
+	 * @param string $key
+	 * @return boolean
+	 */
+	public function isSetAndEmpty($key){
+		if ($this->keyExists($key)) {
+			return $this->isEmpty($key);
+		}
+		return false;
+	}
+
+
+	/**
+	 * Only runs an nonempty check if the key has been set.
+	 *
+	 * @param string $key
+	 * @return boolean
+	 */
+	public function isSetAndNotEmpty($key){
+		if ($this->keyExists($key)) {
+			return !$this->isEmpty($key);
+		}
+		return false;
+	}
+
+
+	/**
+	 * Determines whether or not a value is between a set
+	 * of two other values.
+	 *
+	 * A fourth argument $inc will allow an exact value match
+	 * to return as true.
+	 *
+	 * @param string $key
+	 * @param int $min
+	 * @param int $max
+	 * @param bool $inc
+	 * @return boolean
 	 */
 	public function isBetween($key, $min, $max, $inc = true){
-		$val = $this->getRaw($key);
+		$val = $this->getFloat($key);
 		if ($val > $min && $val < $max) {
 			return true;
 		}
@@ -159,33 +191,38 @@ class CageBase {
 
 
 	/**
+	 * Determines whether the value is greater than a number. Both integers
+	 * and float/dobules accepted.
 	 *
 	 * @param string $key
-	 * @param <type> $min
-	 * @return <type> 
+	 * @param int $min
+	 * @return boolean
 	 */
 	public function isGreaterThan($key, $min){
-		$val = $this->getRaw($key);
+		$val = $this->getFloat($key);
 		return ($val > $min);
 	}
 
 
 	/**
+	 * Determines whether the value is less than a number. Both integers
+	 * and float/dobules accepted.
 	 *
 	 * @param string $key
-	 * @param <type> $max
-	 * @return <type> 
+	 * @param int $min
+	 * @return boolean
 	 */
 	public function isLessThan($key, $max){
-		$val = $this->getRaw($key);
+		$val = $this->getFloat($key);
 		return ($val < $max);
 	}
 
 
 	/**
+	 * Determines if a string is a valid email address.
 	 *
 	 * @param string $key
-	 * @return <type>
+	 * @return boolean
 	 */
 	public function isEmail($key){
 		$val = $this->getRaw($key);
@@ -194,9 +231,10 @@ class CageBase {
 
 
 	/**
-	 *
+	 * Determines whether or not a string is a valid IP address.
+	 * 
 	 * @param string $key
-	 * @return <type> 
+	 * @return boolean
 	 */
 	public function isIP($key){
 		$val = $this->getRaw($key);
@@ -205,10 +243,11 @@ class CageBase {
 
 
 	/**
+	 * Returns if the value is in a provided array.
 	 *
 	 * @param string $key
-	 * @param <type> $allowed
-	 * @return <type> 
+	 * @param array $allowed
+	 * @return boolean
 	 */
 	public function isInArray($key, $allowed = NULL){
 		// @todo: make this work recursively
@@ -221,27 +260,22 @@ class CageBase {
 
 
 	/**
-	 *
+	 * Determines if the value is a valid phone number. Currently, only US
+	 * phone numbers are supported.
+	 * 
 	 * @param string $key
-	 * @param <type> $country
-	 * @return <type> 
+	 * @param string $country
+	 * @return boolean
 	 */
 	public function isPhone($key, $country = 'US'){
 
 		$val = $this->getDigits($key);
 
-		if (!ctype_digit($val)) {
-			return false;
-		}
-
-		switch ($country)
-		{
+		switch ($country){
 			case 'US':
 				if (strlen($val) != 10) {
 					return false;
 				}
-
-				$areaCode = substr($val, 0, 3);
 
 				$areaCodes = array(
 					201, 202, 203, 204, 205, 206, 207, 208,
@@ -288,13 +322,13 @@ class CageBase {
 					959, 970, 971, 972, 973, 978, 979, 980,
 					985, 989);
 
-				return in_array($areaCode, $areaCodes);
+				return in_array( substr($val, 0, 3), $areaCodes);
 				break;
 			default:
-				// @todo return error that country isn't supported
 				return false;
 				break;
 		}
+		return NULL;
 	}
 
 
@@ -330,9 +364,10 @@ class CageBase {
 	
 
 	/**
+	 * Determines if the string is a valid web address.
 	 *
 	 * @param string $key
-	 * @return <type> 
+	 * @return boolean
 	 */
 	public function isUri($key){
 
@@ -357,162 +392,115 @@ class CageBase {
 	}
 
 
-	/**
-     * Returns TRUE if value is a valid hostname, FALSE otherwise.
-     * Depending upon the value of $allow, Internet domain names, IP
-     * addresses, and/or local network names are considered valid.
-     * The default is HOST_ALLOW_ALL, which considers all of the
-     * above to be valid.
-     *
-     * @param mixed $value
-     * @param integer $allow bitfield for ISPK_HOST_ALLOW_DNS, ISPK_HOST_ALLOW_IP, ISPK_HOST_ALLOW_LOCAL
-     * @return boolean
-     *
-     * @tag validator
-     * @static
-     */
-	 //define ('ISPK_HOST_ALLOW_DNS',   1);
-	 //define ('ISPK_HOST_ALLOW_ALL',   7);
-	 //define ('ISPK_HOST_ALLOW_IP',    2);
-	 //define ('ISPK_HOST_ALLOW_LOCAL', 4);
-	 //define ('ISPK_URI_ALLOW_COMMON', 1);
-	 //define ('ISPK_DNS_VALID', '/^(?:[^\W_]((?:[^\W_]|-){0,61}[^\W_])?\.)+[a-zA-Z]{2,6}\.?$/');
-//	static function isHostname($value, $allow = ISPK_HOST_ALLOW_ALL)
-//	{
-//		if (!is_numeric($allow) || !is_int($allow)) {
-//			user_error('Illegal value for $allow; expected an integer', E_USER_WARNING);
-//		}
-//
-//		if ($allow < ISPK_HOST_ALLOW_DNS || ISPK_HOST_ALLOW_ALL < $allow) {
-//			user_error('Illegal value for $allow; expected integer between ' . ISPK_HOST_ALLOW_DNS . ' and ' . ISPK_HOST_ALLOW_ALL, E_USER_WARNING);
-//		}
-//
-//		// determine whether the input is formed as an IP address
-//		$status = self::isIp($value);
-//
-//		// if the input looks like an IP address
-//		if ($status) {
-//			// if IP addresses are not allowed, then fail validation
-//			if (($allow & ISPK_HOST_ALLOW_IP) == 0) {
-//				return FALSE;
-//			}
-//
-//			// IP passed validation
-//			return TRUE;
-//		}
-//
-//		// check input against domain name schema
-//		$status = @preg_match('/^(?:[^\W_]((?:[^\W_]|-){0,61}[^\W_])?\.)+[a-zA-Z]{2,6}\.?$/', $value);
-//		if ($status === false) {
-//			user_error('Internal error: DNS validation failed', E_USER_WARNING);
-//		}
-//
-//		// if the input passes as an Internet domain name, and domain names are allowed, then the hostname
-//		// passes validation
-//		if ($status == 1 && ($allow & ISPK_HOST_ALLOW_DNS) != 0) {
-//			return TRUE;
-//		}
-//
-//		// if local network names are not allowed, then fail validation
-//		if (($allow & ISPK_HOST_ALLOW_LOCAL) == 0) {
-//			return FALSE;
-//		}
-//
-//		// check input against local network name schema; last chance to pass validation
-//		$status = @preg_match('/^(?:[^\W_](?:[^\W_]|-){0,61}[^\W_]\.)*(?:[^\W_](?:[^\W_]|-){0,61}[^\W_])\.?$/',
-//		$value);
-//		if ($status === FALSE) {
-//			user_error('Internal error: local network name validation failed', E_USER_WARNING);
-//		}
-//
-//		if ($status == 0) {
-//			return FALSE;
-//		} else {
-//			return TRUE;
-//		}
-//	}
-
 	/***********************************************************
 	 * SANITIZING RETURN METHODS
 	 ***********************************************************/
 
 
 	/**
-	 *
+	 * Returns a string of only alphabetical characters.
+	 * 
 	 * @param string $key
-	 * @return <type>
+	 * @param string $default
+	 * @return string
 	 */
-	public function getAlpha($key = false){
-		return preg_replace('/[^[:alpha:]]/', '', $this->getKey($key));
+	public function getAlpha($key = false, $default = false){
+		if($this->keyExists($key)){
+			return preg_replace('/[^[:alpha:]]/', '', $this->getKey($key));
+		}
+		return $default;
 	}
 	
 
 	/**
+	 * Returns a string of alphanumeric characters.
 	 *
 	 * @param string $key
-	 * @return <type>
+	 * @param string $default
+	 * @return string
 	 */
-	public function getAlnum($key = false){
-		return preg_replace('/[^[:alnum:]]/', '', $this->getKey($key));
-	}
-
-	// @todo get name: allow alpha, space
-
-
-	/**
-	 *
-	 * @param string $key
-	 * @return <type>
-	 */
-	public function getInt($key = false){
-		return (int) $this->getKey($key);
-	}
-
-
-	/**
-	 *
-	 * @param string $key
-	 * @return <type>
-	 */
-	public function getDigits($key = false){
-		// We need to mimic the type back to the user that they gave us
-		$type = gettype($this->getKey($key));
-		$clean = preg_replace('/[^\d]/', '', $this->getKey($key));
-		settype($clean, $type);
-		return $clean;
-	}
-
-
-	/**
-	 *
-	 * @param string $key
-	 * @return <type>
-	 */
-	public function getFloat($key = false){
-		// We need to mimic the type back to the user that they gave us
-		$type = gettype($this->getKey($key));
-		$clean = preg_replace('/[^\d\.]/', '', $this->getKey($key));
-		settype($clean, $type);
-		return $clean;
-	}
-
-
-	/**
-	 *
-	 * @param string $key
-	 * @return <type> 
-	 */
-	public function getZip($key){
-		preg_match('/(^\d{5}$)|(^\d{5}-\d{4}$)/', $this->getDigits($key), $matches);
-		if(is_array($matches)){
-			return $matches[0];
+	public function getAlnum($key = false, $default = false){
+		if($this->keyExists($key)){
+			return preg_replace('/[^[:alnum:]]/', '', $this->getKey($key));
 		}
-		return false;
+		return $default;
 	}
 
 
-	// @todo getDate
+	/**
+	 * Returns an integer.
+	 *
+	 * @param string $key
+	 * @param string $default
+	 * @return integer
+	 */
+	public function getInt($key = false, $default = false){
+		if($this->keyExists($key)){
+			return (int) $this->getKey($key);
+		}
+		return $default;
+	}
 
+
+	/**
+	 * Returns only numeric characters. The return type is set as the same
+	 * type as the incoming value. If you provide a float, you get a float back.
+	 * If you provide a string, you get a string back.
+	 *
+	 * @param string $key
+	 * @param string $default
+	 * @return mixed
+	 */
+	public function getDigits($key = false, $default = false){
+		if($this->keyExists($key)){
+			// We need to mimic the type back to the user that they gave us
+			$type = gettype($this->getKey($key));
+			$clean = preg_replace('/[^\d]/', '', $this->getKey($key));
+			settype($clean, $type);
+			return $clean;
+		}
+		return $default;
+	}
+
+
+	/**
+	 * Returns a floating-point decimal. The return type is set as the same
+	 * type as the incoming value. If you provide a float, you get a float back.
+	 * If you provide a string, you get a string back.
+	 *
+	 * @param string $key
+	 * @param string $default
+	 * @return mixed
+	 */
+	public function getFloat($key = false, $default = false){
+		if($this->keyExists($key)){
+			// We need to mimic the type back to the user that they gave us
+			$type = gettype($this->getKey($key));
+			$clean = preg_replace('/[^\d\.]/', '', $this->getKey($key));
+			settype($clean, $type);
+			return $clean;
+		}
+		return $default;
+	}
+
+
+	/**
+	 * Returns a US postal code. In the form of either five digits, or nine
+	 * with a hyphen.
+	 *
+	 * @param string $key
+	 * @param string $default
+	 * @return string
+	 */
+	public function getZip($key = false, $default = false){
+		if($this->keyExists($key)){
+			preg_match('/(^\d{5}$)|(^\d{5}-\d{4}$)/', $this->getDigits($key), $matches);
+			if(is_array($matches)){
+				return $matches[0];
+			}
+		}
+		return $default;
+	}
 }
 
 
@@ -522,55 +510,48 @@ class CageBase {
 class Peregrine {
 
 	/**
-	 *
-	 * @var <type>
+	 * @var object
 	 */
 	public $post;
 
 	/**
-	 *
-	 * @var <type>
+	 * @var object
 	 */
 	public $get;
 
 	/**
-	 *
-	 * @var <type>
+	 * @var object
 	 */
 	public $session;
 
 	/**
-	 *
-	 * @var <type>
+	 * @var object
 	 */
 	public $env;
 
 	/**
-	 *
-	 * @var <type>
+	 * @var object
 	 */
 	public $files;
 
 	/**
-	 *
-	 * @var <type>
+	 * @var object
 	 */
 	public $cookie;
 
 	/**
-	 *
-	 * @var <type>
+	 * @var object
 	 */
 	public $server;
 
 
 	/**
-	 * 
+	 * Initializes all of the superglobal cages. Destroys the origin arrays.
 	 */
 	public function init(){
 		$this->get_cage();
 		$this->post_cage();
-//		$this->session_cage();
+		$this->session_cage();
 		$this->cookie_cage();
 		$this->server_cage();
 		$this->env_cage();
@@ -579,9 +560,10 @@ class Peregrine {
 
 
 	/**
+	 * Adds a cage around any array passed to it. It destroys the original array.
 	 *
-	 * @param <type> $var
-	 * @return <type> 
+	 * @param array $var
+	 * @return object
 	 */
 	public function sanitize( &$var ){
 		$tmp = new CageBase($var);
@@ -591,7 +573,7 @@ class Peregrine {
 
 
 	/**
-	 *
+	 * Cages for the $_GET superglobal.
 	 */
 	private function get_cage(){
 		$tmp = $this->sanitize($_GET);
@@ -601,7 +583,7 @@ class Peregrine {
 
 
 	/**
-	 *
+	 * Cages for the $_POST superglobal.
 	 */
 	private function post_cage(){
 		$tmp = $this->sanitize($_POST);
@@ -610,18 +592,24 @@ class Peregrine {
 	}
 
 
-	/**
-	 * @todo detect session update
+	 /**
+	 * Cages for the $_SESSION superglobal.
+	  * @todo need to refresh the cage in case someone has appended new array elements
+	  * How do we do this if we've destroyed the original $_SESSION?
 	 */
-//	private function session_cage(){
-//		$tmp = $this->sanitize($_SESSION);
+	private function session_cage(){
+
+		// possible way to regenerate session:
+		// session_write_close / session_start();
+
+		$tmp = $this->sanitize($_SESSION);
 //		$GLOBALS['HTTP_SESSION_VARS'] = NULL;
 //		$this->_session = $tmp;
-//	}
+	}
 
 
 	/**
-	 *
+	 * Cages for the $_COOKIE superglobal.
 	 */
 	private function cookie_cage(){
 		$tmp = $this->sanitize($_COOKIE);
@@ -631,7 +619,7 @@ class Peregrine {
 	
 
 	/**
-	 *
+	 * Cages for the $_SERVER superglobal.
 	 */
 	private function server_cage(){
 		$tmp = $this->sanitize($_SERVER);
@@ -641,7 +629,7 @@ class Peregrine {
 
 
 	/**
-	 *
+	 * Cages for the $_ENV superglobal.
 	 */
 	private function env_cage(){
 		$tmp = $this->sanitize($_ENV);
@@ -651,7 +639,7 @@ class Peregrine {
 
 
 	/**
-	 *
+	 * Cages for the $_FILES superglobal.
 	 */
 	private function files_cage(){
 		$tmp = $this->sanitize($_FILES);
