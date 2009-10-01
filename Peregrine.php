@@ -14,7 +14,6 @@
  * some custom needs for both single projects and for the Aspen Framework.
  */
 
-// @todo getRawSource();
 // @todo getDate
 // @todo get name: allow alpha, space, hyphen
 
@@ -118,13 +117,10 @@ class CageBase {
 	 * you use this, as it does not allow you to use the class
 	 * filtering functions.
 	 *
-	 * @param string $var
 	 * @return array
 	 */
-	public function getRawSource($var){
-		if(in_array($var, array('post','get','session','cookie','server','env','files'))){
-			return $this->{$var};
-		}
+	public function getRawSource(){
+		return $this->_raw;
 	}
 
 
@@ -602,7 +598,7 @@ class Peregrine {
 	 */
 	public function getRawSource($var){
 		if(in_array($var, array('post','get','session','cookie','server','env','files'))){
-			return $this->{$var};
+			return $this->{$var}->getRawSource();
 		}
 	}
 
