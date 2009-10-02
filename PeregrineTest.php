@@ -48,6 +48,19 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 	/**
 	 *
 	 */
+	public function test_isSetAndEmpty() {
+		$peregrine = new Peregrine;
+		$my_arr = array('test'=>0,'test2'=>'notempty');
+		$arr = $peregrine->sanitize( $my_arr );
+		$this->assertEquals(true, $arr->isSetAndEmpty('test'));
+		$this->assertEquals(false, $arr->isSetAndEmpty('test2'));
+		$this->assertEquals(false, $arr->isSetAndEmpty('test3'));
+	}
+
+
+	/**
+	 *
+	 */
 	public function test_isSetAndNotEmpty() {
 		$peregrine = new Peregrine;
 		$my_arr = array('test'=>0,'test2'=>'notempty');
@@ -61,13 +74,14 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 	/**
 	 *
 	 */
-	public function test_isSetAndEmpty() {
+	public function test_match() {
 		$peregrine = new Peregrine;
-		$my_arr = array('test'=>0,'test2'=>'notempty');
+		$my_arr = array(1,1,2,true);
 		$arr = $peregrine->sanitize( $my_arr );
-		$this->assertEquals(true, $arr->isSetAndEmpty('test'));
-		$this->assertEquals(false, $arr->isSetAndEmpty('test2'));
-		$this->assertEquals(false, $arr->isSetAndEmpty('test3'));
+		$this->assertEquals(true, $arr->match(0,1));
+		$this->assertEquals(false, $arr->match(1,2));
+		$this->assertEquals(true, $arr->match(0,3));
+		$this->assertEquals(false, $arr->match(0,3, true));
 	}
 	
 
@@ -342,6 +356,33 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 		$arr = $peregrine->sanitize( $my_arr );
 		$this->assertEquals(false, $arr->isFloat('test'));
 		$this->assertEquals(true, $arr->isFloat('test2'));
+	}
+
+
+	/**
+	 *
+	 */
+	public function test_getCurrency() {
+		$peregrine = new Peregrine;
+		$my_arr = array('test'=>'$1,000.00','test2'=>1000,'test3'=>'*&^$UUU123');
+		$arr = $peregrine->sanitize( $my_arr );
+		$this->assertEquals('$1,000.00', $arr->getCurrency('test'));
+		$this->assertEquals(1000, $arr->getCurrency('test2'));
+		$this->assertEquals('$123', $arr->getCurrency('test3'));
+	}
+
+
+	/**
+	 *
+	 */
+	public function test_isCurrency() {
+		$peregrine = new Peregrine;
+		$my_arr = array('test'=>'$1,000.00','test2'=>1000,'test3'=>'*&^$UUU123',100.235);
+		$arr = $peregrine->sanitize( $my_arr );
+		$this->assertEquals(true, $arr->isCurrency('test'));
+		$this->assertEquals(true, $arr->isCurrency('test2'));
+		$this->assertEquals(false, $arr->isCurrency('test3'));
+		$this->assertEquals(true, $arr->isCurrency(4));
 	}
 
 

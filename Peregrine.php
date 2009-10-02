@@ -181,6 +181,26 @@ class CageBase {
 	}
 
 
+
+	/**
+	 * Compare two values
+	 *
+	 * @param string $key_1
+	 * @param string $key_2
+	 * @return boolean
+	 */
+	public function match($key_1, $key_2, $strict = false){
+		if ($this->keyExists($key_1) && $this->keyExists($key_2)) {
+			if($strict){
+				return $this->getRaw($key_1) === $this->getRaw($key_2);
+			} else {
+				return $this->getRaw($key_1) == $this->getRaw($key_2);
+			}
+		}
+		return false;
+	}
+
+
 	/**
 	 * Determines whether or not a value is between a set
 	 * of two other values.
@@ -493,6 +513,26 @@ class CageBase {
 			// We need to mimic the type back to the user that they gave us
 			$type = gettype($this->getKey($key));
 			$clean = preg_replace('/[^\d\.]/', '', $this->getKey($key));
+			settype($clean, $type);
+			return $clean;
+		}
+		return $default;
+	}
+
+
+	/**
+	 * Returns a valid US Currency string or float. Accepts decimal point,
+	 * comma, and US dollar sign.
+	 *
+	 * @param string $key
+	 * @param string $default
+	 * @return mixed
+	 */
+	public function getCurrency($key = false, $default = false){
+		if($this->keyExists($key)){
+			// We need to mimic the type back to the user that they gave us
+			$type = gettype($this->getKey($key));
+			$clean = preg_replace('/[^\d\.,\$]/', '', $this->getKey($key));
 			settype($clean, $type);
 			return $clean;
 		}
