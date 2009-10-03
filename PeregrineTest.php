@@ -389,6 +389,34 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 	/**
 	 *
 	 */
+	public function test_getDate() {
+		$peregrine = new Peregrine;
+		$my_arr = array('January 12, 2009','Purple','07:07:09','2009-06-02 22:89:13','2009-06-02 22:15:07');
+		$arr = $peregrine->sanitize( $my_arr );
+		$this->assertEquals('Mon, 12 Jan 09 00:00:00 -0800', $arr->getDate(0));
+		$this->assertEquals(false, $arr->getDate(1));
+		$this->assertEquals('07:07:09', $arr->getDate(2, 'h:i:s'));
+		$this->assertEquals(false, $arr->getDate(3));
+		$this->assertEquals('Tue, 02 Jun 09 22:15:07 -0700', $arr->getDate(4));
+	}
+
+
+	/**
+	 *
+	 */
+	public function test_isDate() {
+		$peregrine = new Peregrine;
+		$my_arr = array('January 12, 2009','Mon, 12 Jan 09 00:00:00 -0800');
+		$arr = $peregrine->sanitize( $my_arr );
+		$this->assertEquals(false, $arr->isDate(0));
+		$this->assertEquals(true, $arr->isDate(1));
+		$this->assertEquals(false, $arr->isDate(0));
+	}
+
+
+	/**
+	 *
+	 */
 	public function test_getZip() {
 		$peregrine = new Peregrine;
 		$my_arr = array('12345','AAA12345');

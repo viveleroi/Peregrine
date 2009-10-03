@@ -541,6 +541,24 @@ class CageBase {
 
 
 	/**
+	 * Checks for a valid date.
+	 * @param string $key
+	 * @param string $format
+	 * @param mixed $default
+	 * @return <type>
+	 */
+	public function getDate($key = false, $format = false, $default = false){
+		if($this->keyExists($key)){
+			$format = $format ? $format : DATE_RFC822;
+			if($time = strtotime($this->getRaw($key))){
+				return date($format, $time);
+			}
+		}
+		return $default;
+	}
+
+
+	/**
 	 * Returns a US postal code. In the form of either five digits, or nine
 	 * with a hyphen.
 	 *
