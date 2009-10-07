@@ -11,11 +11,10 @@
  *
  * This class was partially inspired by Inspekt by Ed Finkler and Chris Shifflet,
  * two folks who have contributed greatly to the php community. In order to meet
- * some custom needs for both single projects and for the Aspen Framework.
+ * some custom needs for both single projects and for the Aspen Framework, this
+ * class was created to make structural and use improvements.
  */
 
-// @todo getDate
-// @todo get name: allow alpha, space, hyphen
 
 /**
  * @package Peregrine
@@ -458,6 +457,37 @@ class CageBase {
 	public function getAlnum($key = false, $default = false){
 		if($this->keyExists($key)){
 			return preg_replace('/[^[:alnum:]]/', '', $this->getKey($key));
+		}
+		return $default;
+	}
+
+
+	/**
+	 * Returns a string of alphanumeric characters, allowing spaces, apostrophes, periods.
+	 *
+	 * @param string $key
+	 * @param string $default
+	 * @return string
+	 */
+	public function getName($key = false, $default = false){
+		if($this->keyExists($key)){
+			return preg_replace('/[^a-zA-Z-[:space:]\.\']/', '', $this->getKey($key));
+		}
+		return $default;
+	}
+
+
+	/**
+	 * Returns an acceptable clean url / HTML element id string
+	 *
+	 * @param string $key
+	 * @param string $default
+	 * @return string
+	 */
+	public function getElemId($key = false, $default = false){
+		if($this->keyExists($key)){
+			$val = str_replace(array(' '), '_', strtolower($this->getKey($key)));
+			return preg_replace('/[^a-zA-Z0-9-_\.]/', '', $val);
 		}
 		return $default;
 	}

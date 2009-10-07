@@ -238,6 +238,55 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('default', $arr->isAlpha('nonexist-key', 'default'));
 	}
 
+
+	/**
+	 *
+	 */
+	public function test_getName() {
+		$peregrine = new Peregrine;
+		$my_arr = array('Bob-bob O\'Mally III.','&^%Bobby');
+		$arr = $peregrine->sanitize( $my_arr );
+		$this->assertEquals('Bob-bob O\'Mally III.', $arr->getName(0));
+		$this->assertEquals('Bobby', $arr->getName(1));
+	}
+
+
+	/**
+	 *
+	 */
+	public function test_isName() {
+		$peregrine = new Peregrine;
+		$my_arr = array('Bob O\'Mally III.','&^%Bobby');
+		$arr = $peregrine->sanitize( $my_arr );
+		$this->assertEquals(true, $arr->isName(0));
+		$this->assertEquals(false, $arr->isName(1));
+	}
+
+
+	/**
+	 *
+	 */
+	public function test_getElemId() {
+		$peregrine = new Peregrine;
+		$my_arr = array('Element ID','&^%Elem098ID');
+		$arr = $peregrine->sanitize( $my_arr );
+		$this->assertEquals('element_id', $arr->getElemId(0));
+		$this->assertEquals('elem098id', $arr->getElemId(1));
+	}
+
+
+	/**
+	 *
+	 */
+	public function test_isElemId() {
+		$peregrine = new Peregrine;
+		$my_arr = array('Element ID','&^%Elem098ID', 'elem_id');
+		$arr = $peregrine->sanitize( $my_arr );
+		$this->assertEquals(false, $arr->isElemId(0));
+		$this->assertEquals(false, $arr->isElemId(1));
+		$this->assertEquals(true, $arr->isElemId(2));
+	}
+
 	
 	/**
 	 *
