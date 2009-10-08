@@ -605,6 +605,23 @@ class CageBase {
 		}
 		return $default;
 	}
+
+
+	/**
+	 * Returns a floating-point decimal. The return type is set as the same
+	 * type as the incoming value. If you provide a float, you get a float back.
+	 * If you provide a string, you get a string back.
+	 *
+	 * @param string $key
+	 * @param string $default
+	 * @return mixed
+	 */
+	public function getPath($key = false, $default = false){
+		if($this->keyExists($key)){
+			return preg_replace('/[^a-zA-Z0-9_~\.\/-]/', '', $this->getKey($key));
+		}
+		return $default;
+	}
 }
 
 

@@ -488,6 +488,37 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	/**
+	 *
+	 */
+	public function test_getPath() {
+		$peregrine = new Peregrine;
+		$my_arr = array('12345','A path','/_apath','/a~path','/usr/local/bin');
+		$arr = $peregrine->sanitize( $my_arr );
+		$this->assertEquals('12345', $arr->getPath(0));
+		$this->assertEquals('Apath', $arr->getPath(1));
+		$this->assertEquals('/_apath', $arr->getPath(2));
+		$this->assertEquals('/a~path', $arr->getPath(3));
+		$this->assertEquals('/usr/local/bin', $arr->getPath(4));
+	}
+
+
+	/**
+	 *
+	 */
+	public function test_isPath() {
+		$peregrine = new Peregrine;
+		$my_arr = array('12345','A path','/_apath','/a~path','/usr/local/bin','?&^%$');
+		$arr = $peregrine->sanitize( $my_arr );
+		$this->assertEquals(true, $arr->isPath(0));
+		$this->assertEquals(false, $arr->isPath(1));
+		$this->assertEquals(true, $arr->isPath(2));
+		$this->assertEquals(true, $arr->isPath(3));
+		$this->assertEquals(true, $arr->isPath(4));
+		$this->assertEquals(false, $arr->isPath(5));
+	}
+
+
 	/***********************************************************
 	 * SUPERGLOBAL CAGE TESTS
 	 ***********************************************************/
