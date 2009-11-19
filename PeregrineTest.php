@@ -199,13 +199,15 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 						'ftp://user@google.com',
 						'https://site.com',
 						'bob',
-						'http://127.0.0.1:80/users/~bob');
+						'http://127.0.0.1:80/users/~bob',
+						'http://127.0.0.1:80/a_path');
 		$arr = $peregrine->sanitize( $my_arr );
 		$this->assertEquals(true, $arr->isUri(0));
 		$this->assertEquals(true, $arr->isUri(1));
 		$this->assertEquals(true, $arr->isUri(2));
 		$this->assertEquals(false, $arr->isUri(3));
 		$this->assertEquals(true, $arr->isUri(4));
+		$this->assertEquals(true, $arr->isUri(5));
 	}
 
 
