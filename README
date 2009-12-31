@@ -1,0 +1,77 @@
+Peregrine - A PHP Security/Caging Class
+Copyright (c) 2009, Michael Botsko Botsko.net, LLC
+Released under the MPL 1.1
+
+Introduction
+============================
+
+Peregrine is a PHP object that aims to improve PHP superglobal security
+by transferring the raw incoming values to private member variables. You may
+then access the data using a wide range of higher security filtering functions.
+
+You may also pass in arrays of custom data to build a custom cage. The filters
+available range from integers, alpha-numeric, emails, url, IP, phone, etc.
+
+It's very easy to work with Peregrine and to integrate it into your framework
+or application.
+
+
+Basics
+============================
+
+First, simply create an instance after including the class file in your code.
+
+$peregrine = new Peregrine;
+
+It will automatically copy and destroy the existing superglobals so that
+you're forced to access them through the secure cages.
+
+For example, to access an incoming GET value that needs to be an integer, simply
+call:
+
+$peregrine->get->getInt('user_id');
+
+
+Method Types
+============================
+
+There are a wide variety of get__() functions, but there are also is__() functions.
+
+For example, to simply test if an array element is a certain value, simply run:
+
+$peregrine->get->isInt('user_id');
+
+You'll get a boolean return rather than the original value.
+
+However, there are also some additional is__ functions, like isEmail, isIp,
+isPhone, isUri, etc.
+
+
+Custom Cages
+============================
+
+You may pass your own arrays to Peregrine using the sanitize method. It will
+delete your original array so that the data only exists in the returned object.
+
+$yourarray = array('myname'=>'Mike Botsko');
+
+$peregrine = new Peregrine;
+$clean = $peregrine->sanitize( $yourarray );
+
+You may use Peregrine as usual:
+
+$clean->getName('myname');
+
+
+
+Known Issues
+============================
+
+- The session superglobal is the only one not destroyed because dealing with it
+is tricky. Since the $_SESSION array is frequently modified by applications, it
+can refresh it by running:
+
+$peregrine->refreshCage('session');
+
+We're working to improve this so that the original session may not be used.
+Comments or suggestions are appreciated.
