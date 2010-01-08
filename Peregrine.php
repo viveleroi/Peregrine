@@ -26,6 +26,12 @@ class CageBase {
 	 */
 	private $_raw;
 
+	/**
+	 * @var array Holds any arguments needed by the __call method
+	 * @access private
+	 */
+	private $_args;
+
 
 	/**
 	 * Loads the incoming source array to the raw private variable.
@@ -78,17 +84,50 @@ class CageBase {
 	 */
 	public function __call($method, $args){
 
+		$this->_args = $args;
+
 		// $key should be first arg
-		$key = false;
-		if(array_key_exists(0, $args)){
-			$key = $args[0];
-		}
+		$key = $this->getArg(0);
 
 		if($key !== false && strpos($method, 'is') !== false){
 			$real_method = str_replace('is', 'get', $method);
 			if(method_exists($this, $real_method)){
-				return $this->{$real_method}($key) === $this->getRaw($key);
+				$res = $this->{$real_method}($key,
+											$this->getArg(1),
+											$this->getArg(2),
+											$this->getArg(3),
+											$this->getArg(4));
+				return $res === $this->getRaw($key);
 			}
+		}
+
+		if($key !== false && strpos($method, 'get') !== false){
+			$real_method = str_replace('get', 'is', $method);
+			if(method_exists($this, $real_method)){
+				if($this->{$real_method}($key,
+											$this->getArg(1),
+											$this->getArg(2),
+											$this->getArg(3),
+											$this->getArg(4))){
+					return $this->getRaw($key);
+				}
+				return false;
+			}
+		}
+
+		return NULL;
+	}
+
+
+	/**
+	 * Returns an argument position for items passed to __call
+	 *
+	 * @param integer $pos
+	 * @return mixed
+	 */
+	private function getArg($pos = 0){
+		if(array_key_exists($pos, $this->_args)){
+			return $this->_args[$pos];
 		}
 		return NULL;
 	}
@@ -212,7 +251,8 @@ class CageBase {
 	 * @param bool $inc
 	 * @return boolean
 	 */
-	public function isBetween($key, $min, $max, $inc = true){
+	public function isBetween($key, $min, $max, $inc = NULL){
+		$inc = $inc === NULL ? true : $inc;
 		$val = $this->getFloat($key);
 		if ($val > $min && $val < $max) {
 			return true;
@@ -301,7 +341,9 @@ class CageBase {
 	 * @param string $country
 	 * @return boolean
 	 */
-	public function isPhone($key, $country = 'US'){
+	public function isPhone($key, $country = NULL){
+
+		$country = $country === NULL ? 'US' : $country;
 
 		$val = $this->getDigits($key);
 
@@ -438,7 +480,8 @@ class CageBase {
 	 * @param string $default
 	 * @return string
 	 */
-	public function getAlpha($key = false, $default = false){
+	public function getAlpha($key = false, $default = NULL){
+		$default = $default === NULL ? false : $default;
 		if($this->keyExists($key)){
 			return preg_replace('/[^[:alpha:]]/', '', $this->getKey($key));
 		}
@@ -453,7 +496,8 @@ class CageBase {
 	 * @param string $default
 	 * @return string
 	 */
-	public function getAlnum($key = false, $default = false){
+	public function getAlnum($key = false, $default = NULL){
+		$default = $default === NULL ? false : $default;
 		if($this->keyExists($key)){
 			return preg_replace('/[^[:alnum:]]/', '', $this->getKey($key));
 		}
@@ -468,7 +512,8 @@ class CageBase {
 	 * @param string $default
 	 * @return string
 	 */
-	public function getName($key = false, $default = false){
+	public function getName($key = false, $default = NULL){
+		$default = $default === NULL ? false : $default;
 		if($this->keyExists($key)){
 			return preg_replace('/[^a-zA-Z-[:space:]\.\']/', '', $this->getKey($key));
 		}
@@ -483,7 +528,8 @@ class CageBase {
 	 * @param string $default
 	 * @return string
 	 */
-	public function getElemId($key = false, $default = false){
+	public function getElemId($key = false, $default = NULL){
+		$default = $default === NULL ? false : $default;
 		if($this->keyExists($key)){
 			$val = str_replace(array(' '), '_', strtolower($this->getKey($key)));
 			return preg_replace('/[^a-zA-Z0-9-_\.]/', '', $val);
@@ -499,7 +545,8 @@ class CageBase {
 	 * @param string $default
 	 * @return integer
 	 */
-	public function getInt($key = false, $default = false){
+	public function getInt($key = false, $default = NULL){
+		$default = $default === NULL ? false : $default;
 		if($this->keyExists($key)){
 			return (int) $this->getKey($key);
 		}
@@ -516,7 +563,8 @@ class CageBase {
 	 * @param string $default
 	 * @return mixed
 	 */
-	public function getDigits($key = false, $default = false){
+	public function getDigits($key = false, $default = NULL){
+		$default = $default === NULL ? false : $default;
 		if($this->keyExists($key)){
 			// We need to mimic the type back to the user that they gave us
 			$type = gettype($this->getKey($key));
@@ -537,7 +585,8 @@ class CageBase {
 	 * @param string $default
 	 * @return mixed
 	 */
-	public function getFloat($key = false, $default = false){
+	public function getFloat($key = false, $default = NULL){
+		$default = $default === NULL ? false : $default;
 		if($this->keyExists($key)){
 			// We need to mimic the type back to the user that they gave us
 			$type = gettype($this->getKey($key));
@@ -557,7 +606,8 @@ class CageBase {
 	 * @param string $default
 	 * @return mixed
 	 */
-	public function getCurrency($key = false, $default = false){
+	public function getCurrency($key = false, $default = NULL){
+		$default = $default === NULL ? false : $default;
 		if($this->keyExists($key)){
 			// We need to mimic the type back to the user that they gave us
 			$type = gettype($this->getKey($key));
@@ -576,7 +626,8 @@ class CageBase {
 	 * @param mixed $default
 	 * @return <type>
 	 */
-	public function getDate($key = false, $format = false, $default = false){
+	public function getDate($key = false, $format = false, $default = NULL){
+		$default = $default === NULL ? false : $default;
 		if($this->keyExists($key)){
 			$format = $format ? $format : DATE_RFC822;
 			if($time = strtotime($this->getRaw($key))){
@@ -595,7 +646,8 @@ class CageBase {
 	 * @param string $default
 	 * @return string
 	 */
-	public function getZip($key = false, $default = false){
+	public function getZip($key = false, $default = NULL){
+		$default = $default === NULL ? false : $default;
 		if($this->keyExists($key)){
 			preg_match('/(^\d{5}$)|(^\d{5}-\d{4}$)/', $this->getDigits($key), $matches);
 			if(is_array($matches)){
@@ -615,7 +667,8 @@ class CageBase {
 	 * @param string $default
 	 * @return mixed
 	 */
-	public function getPath($key = false, $default = false){
+	public function getPath($key = false, $default = NULL){
+		$default = $default === NULL ? false : $default;
 		if($this->keyExists($key)){
 			return preg_replace('/[^a-zA-Z0-9_~\.\/-]/', '', $this->getKey($key));
 		}

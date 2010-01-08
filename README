@@ -33,21 +33,27 @@ For example, to access an incoming GET value that needs to be an integer, simply
 call:
 
 $peregrine->get->getInt('user_id');
+// might equal (bool)true
 
 
 Method Types
 ============================
 
-There are a wide variety of get__() functions, but there are also is__() functions.
-
-For example, to simply test if an array element is a certain value, simply run:
+All of the available functions may be called with either a get__() or is__()
+format. For example, to simply test if an array element is a certain value,
+simply run:
 
 $peregrine->get->isInt('user_id');
 
-You'll get a boolean return rather than the original value.
+You'll get a boolean return telling if it *is* an integer or not.
 
-However, there are also some additional is__ functions, like isEmail, isIp,
-isPhone, isUri, etc.
+If you want to return the value if it meets your criteria, or at least
+the characters that do, you may call the get__() version:
+
+$peregrine->get->getInt('user_id');
+// might equal (int)1
+
+For a complete list of methods, take a look at the peregrine class.
 
 
 Custom Cages
