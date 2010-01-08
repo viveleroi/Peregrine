@@ -2,15 +2,9 @@
 
 # THIS SCRIPT WAS DESIGNED TO PREPARE PEREGRINE FOR A PRODUCTION RELEASE
 
-if [ $# -ne 3 ]; then
-     echo 1>&2 Usage: 1.0 rc1 Release_Candidate
+if [ $# -lt 1 ]; then
+     echo 1>&2 Usage: 1.0 final, or head
      exit 0
-fi
-
-if [ $2 = "final" ]; then
-     versname=$1
-else 
-     versname=$1$2
 fi
 
 # remove any existing exports
@@ -21,7 +15,9 @@ git clone git://github.com/botskonet/Peregrine.git
 cd Peregrine
 
 # checkout the proper branch
-git checkout --track -b $1$2 origin/$1$2
+if [ $1 != "head" ]; then
+	git checkout --track -b $1$2 origin/$1$2
+fi
 
 # get the git revision number 
 gitvers=`git describe`
