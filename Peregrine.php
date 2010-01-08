@@ -738,7 +738,7 @@ class Peregrine {
 	 * @param array $var
 	 * @return object
 	 */
-	public function sanitize( &$var ){
+	static public function sanitize( &$var ){
 		$tmp = new CageBase($var);
 		$var = null;
 		return $tmp;

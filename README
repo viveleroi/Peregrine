@@ -63,9 +63,7 @@ You may pass your own arrays to Peregrine using the sanitize method. It will
 delete your original array so that the data only exists in the returned object.
 
 $yourarray = array('myname'=>'Mike Botsko');
-
-$peregrine = new Peregrine;
-$clean = $peregrine->sanitize( $yourarray );
+$clean = Peregrine::sanitize( $yourarray );
 
 You may use Peregrine as usual:
 
@@ -84,3 +82,11 @@ $peregrine->refreshCage('session');
 
 We're working to improve this so that the original session may not be used.
 Comments or suggestions are appreciated.
+
+
+- Because of how the magic is/get functions work, they pass additional
+arguments no matter what and those are going to be NULL unless you've
+set them. The methods were designed to default any additional
+arguments that are NULL back to their real defaults. If you want a real
+NULL returned as the default, you'll have to use the real methods with
+your own condition logic.
