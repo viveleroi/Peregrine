@@ -23,8 +23,11 @@ First, simply create an instance after including the class file in your code.
 
 $peregrine = new Peregrine;
 
-It will automatically copy and destroy the existing superglobals so that
-you're forced to access them through the secure cages.
+To automatically copy and destroy the existing superglobals so that
+you're forced to access them through the secure cages, simply call the init
+function:
+
+$peregrine->init();
 
 For example, to access an incoming GET value that needs to be an integer, simply
 call:

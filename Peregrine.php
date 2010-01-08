@@ -15,7 +15,6 @@
  * class was created to make structural and use improvements.
  */
 
-
 /**
  * @package Peregrine
  */
