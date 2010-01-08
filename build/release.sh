@@ -39,7 +39,7 @@ rm -f .DS_Store
 
 # make tarball
 tar czvf p-temp.tar.gz *
-mv p-temp.tar.gz ../Peregrine-$versname.tar.gz
+mv p-temp.tar.gz ../Peregrine-$gitvers.tar.gz
 cd ..
 rm -rf latest
 mv Peregrine latest
