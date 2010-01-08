@@ -3,6 +3,7 @@
  * @package  Peregrine
  * @author   Michael Botsko, Trellis Development, LLC
  * @license  Mozilla Public License, 1.1
+ * @version  Git-Version
  *
  * Peregrine is a class that aims to improve PHP superglobal security
  * by transferring the raw incoming values to private member variables.
