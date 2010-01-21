@@ -16,6 +16,19 @@ It's very easy to work with Peregrine and to integrate it into your framework
 or application.
 
 
+Features
+============================
+
+- Provides common filtering to securely access data
+- Wipes original "unsafe" data
+- Easily integrated into existing code, minimal code
+- Sanitize custom data, and/or PHP superglobals
+- Allows both is/get functionality for all methods
+- get__ methods allow custom default values in case nothing is passed
+- Growing number of methods for non-standard filtering: names,
+valid html element id types, etc
+
+
 Basics
 ============================
 
