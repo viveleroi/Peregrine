@@ -660,9 +660,7 @@ class CageBase {
 
 
 	/**
-	 * Returns a floating-point decimal. The return type is set as the same
-	 * type as the incoming value. If you provide a float, you get a float back.
-	 * If you provide a string, you get a string back.
+	 * Returns characters generally allowed within a file system path
 	 *
 	 * @param string $key
 	 * @param string $default
@@ -671,7 +669,7 @@ class CageBase {
 	public function getPath($key = false, $default = NULL){
 		$default = $default === NULL ? false : $default;
 		if($this->keyExists($key)){
-			return preg_replace('/[^a-zA-Z0-9_~\.\/-]/', '', $this->getKey($key));
+			return preg_replace('/[^a-zA-Z0-9_:~\.\/-]/', '', $this->getKey($key));
 		}
 		return $default;
 	}
