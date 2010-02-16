@@ -183,13 +183,14 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 	 *
 	 */
 	public function test_getEmail() {
-		$my_arr = array('test','test@','test@test','fake@test.com','test+test@test.com');
+		$my_arr = array('test','test@','test@test','fake@test.com','test+test@test.com','');
 		$arr = Peregrine::sanitize( $my_arr );
 		$this->assertEquals(false, $arr->getEmail(0));
 		$this->assertEquals(false, $arr->getEmail(1));
 		$this->assertEquals(false, $arr->getEmail(2));
 		$this->assertEquals('fake@test.com', $arr->getEmail(3));
 		$this->assertEquals('test+test@test.com', $arr->getEmail(4));
+		$this->assertEquals(false, $arr->getEmail(5));
 	}
 
 
@@ -256,10 +257,11 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 	 *
 	 */
 	public function test_getPhone() {
-		$my_arr = array('503AAAA','5031239999');
+		$my_arr = array('503AAAA','5031239999','');
 		$arr = Peregrine::sanitize( $my_arr );
 		$this->assertEquals(false, $arr->getPhone(0));
 		$this->assertEquals('5031239999', $arr->getPhone(1));
+		$this->assertEquals(false, $arr->getPhone(2));
 	}
 
 
@@ -279,11 +281,12 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 	 *
 	 */
 	public function test_getCreditCard() {
-		$my_arr = array('4111111111111111','4111-1111-1111-1111','KTP');
+		$my_arr = array('4111111111111111','4111-1111-1111-1111','KTP','');
 		$arr = Peregrine::sanitize( $my_arr );
 		$this->assertEquals('4111111111111111', $arr->getCreditCard(0));
 		$this->assertEquals('4111-1111-1111-1111', $arr->getCreditCard(1));
 		$this->assertEquals(false, $arr->isCreditCard(2));
+		$this->assertEquals(false, $arr->isCreditCard(3));
 	}
 
 
@@ -297,7 +300,8 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 						'https://site.com',
 						'bob',
 						'http://127.0.0.1:80/users/~bob',
-						'http://127.0.0.1:80/a_path');
+						'http://127.0.0.1:80/a_path',
+						'');
 		$arr = Peregrine::sanitize( $my_arr );
 		$this->assertEquals(true, $arr->isUri(0));
 		$this->assertEquals(true, $arr->isUri(1));
@@ -305,6 +309,7 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(false, $arr->isUri(3));
 		$this->assertEquals(true, $arr->isUri(4));
 		$this->assertEquals(true, $arr->isUri(5));
+		$this->assertEquals(false, $arr->isUri(6));
 	}
 
 
@@ -318,7 +323,8 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 						'https://site.com',
 						'bob',
 						'http://127.0.0.1:80/users/~bob',
-						'http://127.0.0.1:80/a_path');
+						'http://127.0.0.1:80/a_path',
+						'');
 		$arr = Peregrine::sanitize( $my_arr );
 		$this->assertEquals('http://www.google.com', $arr->getUri(0));
 		$this->assertEquals('ftp://user@google.com', $arr->getUri(1));
@@ -326,6 +332,7 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(false, $arr->getUri(3));
 		$this->assertEquals('http://127.0.0.1:80/users/~bob', $arr->getUri(4));
 		$this->assertEquals('http://127.0.0.1:80/a_path', $arr->getUri(5));
+		$this->assertEquals(false, $arr->getUri(6));
 	}
 
 
@@ -338,10 +345,11 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 	 *
 	 */
 	public function test_getAlpha() {
-		$my_arr = array('test'=>ALL_CHAR_STRING);
+		$my_arr = array('test'=>ALL_CHAR_STRING,'');
 		$arr = Peregrine::sanitize( $my_arr );
 		$this->assertEquals('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', $arr->getAlpha('test'));
 		$this->assertEquals('default', $arr->getAlpha('nonexist-key', 'default'));
+		$this->assertEquals(false, $arr->getAlpha(1));
 	}
 
 
@@ -360,10 +368,11 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 	 *
 	 */
 	public function test_getName() {
-		$my_arr = array('Bob-bob O\'Mally III.','&^%Bobby');
+		$my_arr = array('Bob-bob O\'Mally III.','&^%Bobby','');
 		$arr = Peregrine::sanitize( $my_arr );
 		$this->assertEquals('Bob-bob O\'Mally III.', $arr->getName(0));
 		$this->assertEquals('Bobby', $arr->getName(1));
+		$this->assertEquals(false, $arr->getName(2));
 	}
 
 
@@ -382,10 +391,11 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 	 *
 	 */
 	public function test_getElemId() {
-		$my_arr = array('Element ID','&^%Elem098ID');
+		$my_arr = array('Element ID','&^%Elem098ID','');
 		$arr = Peregrine::sanitize( $my_arr );
 		$this->assertEquals('element_id', $arr->getElemId(0));
 		$this->assertEquals('elem098id', $arr->getElemId(1));
+		$this->assertEquals(false, $arr->getElemId(2));
 	}
 
 
@@ -532,7 +542,8 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(true, $arr->isCurrency('test'));
 		$this->assertEquals(true, $arr->isCurrency('test2'));
 		$this->assertEquals(false, $arr->isCurrency('test3'));
-		$this->assertEquals(true, $arr->isCurrency(4));
+		$this->assertEquals(true, $arr->isCurrency(0));
+		$this->assertEquals(false, $arr->isCurrency(4));
 	}
 
 
@@ -540,13 +551,14 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 	 *
 	 */
 	public function test_getDate() {
-		$my_arr = array('January 12, 2009','Purple','07:07:09','2009-06-02 22:89:13','2009-06-02 22:15:07');
+		$my_arr = array('January 12, 2009','Purple','07:07:09','2009-06-02 22:89:13','2009-06-02 22:15:07','');
 		$arr = Peregrine::sanitize( $my_arr );
 		$this->assertEquals('Mon, 12 Jan 09 00:00:00 -0800', $arr->getDate(0));
 		$this->assertEquals(false, $arr->getDate(1));
 		$this->assertEquals('07:07:09', $arr->getDate(2, 'h:i:s'));
 		$this->assertEquals(false, $arr->getDate(3));
 		$this->assertEquals('Tue, 02 Jun 09 22:15:07 -0700', $arr->getDate(4));
+		$this->assertEquals(false, $arr->getDate(5));
 	}
 
 
@@ -566,11 +578,12 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 	 *
 	 */
 	public function test_getZip() {
-		$my_arr = array('12345','AAA12345');
+		$my_arr = array('12345','AAA12345','');
 		$arr = Peregrine::sanitize( $my_arr );
 		$this->assertEquals('12345', $arr->getZip(0));
 		$this->assertEquals('12345', $arr->getZip(1));
 		$this->assertEquals('12345', $arr->getFloat('nonexist-key', '12345'));
+		$this->assertEquals(false, $arr->getZip(2));
 	}
 
 	
@@ -589,13 +602,14 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 	 *
 	 */
 	public function test_getPath() {
-		$my_arr = array('12345','A path','/_apath','/a~path','/usr/local/bin');
+		$my_arr = array('12345','A path','/_apath','/a~path','/usr/local/bin','');
 		$arr = Peregrine::sanitize( $my_arr );
 		$this->assertEquals('12345', $arr->getPath(0));
 		$this->assertEquals('Apath', $arr->getPath(1));
 		$this->assertEquals('/_apath', $arr->getPath(2));
 		$this->assertEquals('/a~path', $arr->getPath(3));
 		$this->assertEquals('/usr/local/bin', $arr->getPath(4));
+		$this->assertEquals(false, $arr->getPath(5));
 	}
 
 
@@ -614,6 +628,31 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	/**
+	 *
+	 */
+	public function test_getArray() {
+		$my_arr = array(array(1,2), false, 'bob');
+		$arr = Peregrine::sanitize( $my_arr );
+		$this->assertEquals(array(1,2), $arr->getArray(0));
+		$this->assertEquals(false, $arr->getArray(1));
+		$this->assertEquals(false, $arr->getArray(2));
+	}
+
+
+	/**
+	 *
+	 */
+	public function test_isArray() {
+		$my_arr = array(array(1,2), false, 'bob');
+		$arr = Peregrine::sanitize( $my_arr );
+		$this->assertEquals(true, $arr->isArray(0));
+		$this->assertEquals(false, $arr->isArray(1));
+		$this->assertEquals(false, $arr->isArray(2));
+	}
+
+
+
 	/***********************************************************
 	 * SUPERGLOBAL CAGE TESTS
 	 ***********************************************************/
@@ -625,7 +664,6 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 	public function test_serveCage() {
 		$peregrine = new Peregrine;
 		$peregrine->init();
-
 		$this->assertEquals(NULL, $_SERVER);
 		$this->assertEquals(true, is_string($peregrine->server->getRaw('HOSTNAME')));
 	}
