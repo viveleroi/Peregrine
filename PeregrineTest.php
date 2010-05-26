@@ -336,6 +336,48 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 	}
 
 
+	/**
+	 *
+	 */
+	public function test_isTopLevelDomain() {
+		$my_arr = array(
+						'http://www.google.com',
+						'bob',
+						'www.domain.com:80/users/~bob',
+						'domain.com:80/a_path',
+						'www.domain.com:80',
+						'domain.com');
+		$arr = Peregrine::sanitize( $my_arr );
+		$this->assertEquals(false, $arr->isTopLevelDomain(0));
+		$this->assertEquals(false, $arr->isTopLevelDomain(1));
+		$this->assertEquals(false, $arr->isTopLevelDomain(2));
+		$this->assertEquals(false, $arr->isTopLevelDomain(3));
+		$this->assertEquals(false, $arr->isTopLevelDomain(4));
+		$this->assertEquals(true, $arr->isTopLevelDomain(5));
+	}
+
+
+	/**
+	 *
+	 */
+	public function test_getTopLevelDomain() {
+		$my_arr = array(
+						'http://www.google.com',
+						'bob',
+						'www.domain.com:80/users/~bob',
+						'domain.com:80/a_path',
+						'www.domain.com:80',
+						'domain.com');
+		$arr = Peregrine::sanitize( $my_arr );
+		$this->assertEquals('', $arr->getTopLevelDomain(0));
+		$this->assertEquals('', $arr->getTopLevelDomain(1));
+		$this->assertEquals('', $arr->getTopLevelDomain(2));
+		$this->assertEquals('', $arr->getTopLevelDomain(3));
+		$this->assertEquals('', $arr->getTopLevelDomain(4));
+		$this->assertEquals('domain.com', $arr->getTopLevelDomain(5));
+	}
+
+
 	/***********************************************************
 	 * SANITIZING RETURN METHOD TESTS
 	 ***********************************************************/
@@ -625,6 +667,74 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(true, $arr->isPath(3));
 		$this->assertEquals(true, $arr->isPath(4));
 		$this->assertEquals(false, $arr->isPath(5));
+	}
+
+
+	/**
+	 *
+	 */
+	public function test_getQueryString() {
+		$my_arr = array('12345','A path','/_apath','/a~path','/usr/local/bin','/a/subfolder?test=test','/a/subfolder?test[]={elem:value}','','\'SQL\'');
+		$arr = Peregrine::sanitize( $my_arr );
+		$this->assertEquals('12345', $arr->getQueryString(0));
+		$this->assertEquals('Apath', $arr->getQueryString(1));
+		$this->assertEquals('/_apath', $arr->getQueryString(2));
+		$this->assertEquals('/a~path', $arr->getQueryString(3));
+		$this->assertEquals('/usr/local/bin', $arr->getQueryString(4));
+		$this->assertEquals('/a/subfolder?test=test', $arr->getQueryString(5));
+		$this->assertEquals('/a/subfolder?test[]={elem:value}', $arr->getQueryString(6));
+		$this->assertEquals(false, $arr->getQueryString(7));
+		$this->assertEquals('SQL', $arr->getQueryString(8));
+	}
+
+
+	/**
+	 *
+	 */
+	public function test_isQueryString() {
+		$my_arr = array('12345','A path','/_apath','/a~path','/usr/local/bin','/a/subfolder?test=test','/a/subfolder?test[]={elem:value}','','\'SQL\'');
+		$arr = Peregrine::sanitize( $my_arr );
+		$this->assertEquals(true, $arr->isQueryString(0));
+		$this->assertEquals(false, $arr->isQueryString(1));
+		$this->assertEquals(true, $arr->isQueryString(2));
+		$this->assertEquals(true, $arr->isQueryString(3));
+		$this->assertEquals(true, $arr->isQueryString(4));
+		$this->assertEquals(true, $arr->isQueryString(5));
+		$this->assertEquals(true, $arr->isQueryString(6));
+		$this->assertEquals(false, $arr->isQueryString(7));
+		$this->assertEquals(false, $arr->isQueryString(8));
+	}
+
+
+	/**
+	 *
+	 */
+	public function test_getServerName() {
+		$my_arr = array('12345','domain.com','www.domain.com','?var=test','localhost','\'INSERT INTO\'','127.0.0.1');
+		$arr = Peregrine::sanitize( $my_arr );
+		$this->assertEquals('12345', $arr->getServerName(0));
+		$this->assertEquals('domain.com', $arr->getServerName(1));
+		$this->assertEquals('www.domain.com', $arr->getServerName(2));
+		$this->assertEquals('', $arr->getServerName(3));
+		$this->assertEquals('localhost', $arr->getServerName(4));
+		$this->assertEquals('', $arr->getServerName(5));
+		$this->assertEquals('127.0.0.1', $arr->getServerName(6));
+	}
+
+
+	/**
+	 *
+	 */
+	public function test_isServerName() {
+		$my_arr = array('12345','domain.com','www.domain.com','?var=test','localhost','\'INSERT INTO\'','127.0.0.1');
+		$arr = Peregrine::sanitize( $my_arr );
+		$this->assertEquals(true, $arr->isServerName(0));
+		$this->assertEquals(true, $arr->isServerName(1));
+		$this->assertEquals(true, $arr->isServerName(2));
+		$this->assertEquals(false, $arr->isServerName(3));
+		$this->assertEquals(true, $arr->isServerName(4));
+		$this->assertEquals(false, $arr->isServerName(5));
+		$this->assertEquals(true, $arr->isServerName(6));
 	}
 
 
