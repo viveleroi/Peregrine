@@ -224,10 +224,10 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 	 *
 	 */
 	public function test_isInArray() {
-		$my_arr = array('apple');
+		$my_arr = array('fruits'=>array('apple','banana'));
 		$arr = Peregrine::sanitize( $my_arr );
-		$this->assertEquals(true, $arr->isInArray(0, array('apple', 'banana')));
-		$this->assertEquals(NULL, $arr->isInArray(0, 'hello'));
+		$this->assertEquals(true, $arr->isInArray('fruits', 'apple'));
+		$this->assertEquals(NULL, $arr->isInArray('fruits','pear'));
 	}
 
 
@@ -235,10 +235,10 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 	 *
 	 */
 	public function test_getInArray() {
-		$my_arr = array('apple');
+		$my_arr = array('fruits'=>array('apple','banana'));
 		$arr = Peregrine::sanitize( $my_arr );
-		$this->assertEquals('apple', $arr->getInArray(0, array('apple', 'banana')));
-		$this->assertEquals(NULL, $arr->getInArray(0, 'hello'));
+		$this->assertEquals(array('apple','banana'), $arr->getInArray('fruits', 'apple'));
+		$this->assertEquals(NULL, $arr->getInArray('fruits','pear'));
 	}
 
 
@@ -674,7 +674,7 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 	 *
 	 */
 	public function test_getQueryString() {
-		$my_arr = array('12345','A path','/_apath','/a~path','/usr/local/bin','/a/subfolder?test=test','/a/subfolder?test[]={elem:value}','','\'SQL\'');
+		$my_arr = array('12345','A path','/_apath','/a~path','/usr/local/bin','/a/subfolder?test=test','/a/subfolder?test[]={el-em:value}','','\'SQL\'');
 		$arr = Peregrine::sanitize( $my_arr );
 		$this->assertEquals('12345', $arr->getQueryString(0));
 		$this->assertEquals('Apath', $arr->getQueryString(1));
@@ -682,7 +682,7 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('/a~path', $arr->getQueryString(3));
 		$this->assertEquals('/usr/local/bin', $arr->getQueryString(4));
 		$this->assertEquals('/a/subfolder?test=test', $arr->getQueryString(5));
-		$this->assertEquals('/a/subfolder?test[]={elem:value}', $arr->getQueryString(6));
+		$this->assertEquals('/a/subfolder?test[]={el-em:value}', $arr->getQueryString(6));
 		$this->assertEquals(false, $arr->getQueryString(7));
 		$this->assertEquals('SQL', $arr->getQueryString(8));
 	}
