@@ -1,16 +1,17 @@
 Peregrine - A PHP Security/Caging Class
 Copyright (c) 2009, Michael Botsko Botsko.net, LLC
-Released under the MPL 1.1
 
 Introduction
 ============================
 
 Peregrine is a PHP object that aims to improve PHP superglobal security
 by transferring the raw incoming values to private member variables. You may
-then access the data using a wide range of higher security filtering functions.
+then access the data using a wide range of more secure filtering functions.
 
 You may also pass in arrays of custom data to build a custom cage. The filters
-available range from integers, alpha-numeric, emails, url, IP, phone, etc.
+available range from integers, alpha-numeric, emails, url, IP, phone, etc. All
+methods come in an is__ and get__ flavor, returning boolean or valid values
+respectively.
 
 It's very easy to work with Peregrine and to integrate it into your framework
 or application.
@@ -46,7 +47,6 @@ For example, to access an incoming GET value that needs to be an integer, simply
 call:
 
 $peregrine->get->getInt('user_id');
-// might equal (bool)true
 
 
 Method Types
@@ -57,6 +57,7 @@ format. For example, to simply test if an array element is a certain value,
 simply run:
 
 $peregrine->get->isInt('user_id');
+// will return (bool)
 
 You'll get a boolean return telling if it *is* an integer or not.
 
