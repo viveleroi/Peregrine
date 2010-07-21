@@ -147,6 +147,41 @@ class CageBase {
 	public function getRawSource(){
 		return $this->_raw;
 	}
+	
+	
+	/**
+	 * Allows the user to combine fields into a specified printf string
+	 * and then validate the entire string with any Peregrine method.
+	 *
+     * Example: this allows the user to combine three-field-phone numbers
+ 	 * and validate the entire string. 
+	 *
+	 * $p->post->combine('%s%s%s', array('area','prefix','suffix'), 'getDigits'));
+	 *
+	 * @param string $str
+	 * @param array $fields
+	 * @param string $method
+	 * @access public
+	 */
+	public function combine($str, $fields = array(), $method = false, $args = array()){
+		if(is_array($fields) && $method){
+			// Load raw field values
+			$dirty_fields = array($str);
+			foreach($fields as $field){
+				$dirty_fields[] = $this->getRaw($field);
+			}
+			// Pass them all to the sprintf func and pass the resulting array to a new peregrine
+			// instance, and then return the results of the specific method.
+			$combined = array('combined'=>call_user_func_array('sprintf', $dirty_fields));
+			$p = new Peregrine();
+			$clean = $p->sanitize($combined);
+			// Pass any additional method arguments since certain methods allow for additional
+			// configuration.
+			$args = array_merge(array('combined'),$args);
+			return call_user_func_array(array($clean,$method), $args);
+		}
+		return false;
+	}
 
 
 	/***********************************************************

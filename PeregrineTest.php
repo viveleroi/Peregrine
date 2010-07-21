@@ -26,6 +26,16 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(NULL, $my_arr);
 	}
 	
+	
+	/**
+	 * 
+	 */
+	public function test_combine() {
+		$my_arr = array('month'=>'04','day'=>'01','year'=>'2010');
+		$arr = Peregrine::sanitize( $my_arr );
+		$this->assertEquals('2010-04-01', $arr->combine('%s-%s-%s', array('year','month','day'), 'getDate', array('Y-m-d')));
+	}
+	
 
 	/**
 	 * 

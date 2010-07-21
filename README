@@ -1,5 +1,5 @@
 Peregrine - A PHP Security/Caging Class
-Copyright (c) 2009, Michael Botsko Botsko.net, LLC
+Copyright (c) 2009-2010, Michael Botsko Botsko.net, LLC
 
 Introduction
 ============================
@@ -26,6 +26,7 @@ Features
 - Sanitize custom data, and/or PHP superglobals
 - Allows both is/get functionality for all methods
 - get__ methods allow custom default values in case nothing is passed
+- Combine multiple fields to validate as group - for dates, phone numbers, etc
 - Growing number of methods for non-standard filtering: names,
 valid html element id types, etc
 
@@ -83,6 +84,27 @@ You may use Peregrine as usual:
 
 $clean->getName('myname');
 
+
+Combining Fields
+============================
+
+When designing a form, you'll often have a single piece of data separated into
+several fields. Dates and phone numbers are the most common. It's a pain
+to validate each field separately or to combine the data yourself, and then
+validate it.
+
+Peregrine provides an awesome method that does all of this for you.
+
+For example, if we want to combine month/day/year fields and validate them all
+as a date, we can:
+
+$p->combine('%s-%s-%s', array('year','month','day'), 'getDate', array('Y-m-d'));
+
+The first argument is our template string, which is determines how our fields
+are to be combined. The second is an array of field names.
+
+The third is which method in Perergrine you want to use to validate the end result, 
+and the fourth is any arguments which need to be passed to the validation method.
 
 
 Known Issues

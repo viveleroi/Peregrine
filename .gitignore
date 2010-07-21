@@ -1,2 +1,4 @@
 nbproject
 .DS_Store
+*.tmproj
+.ftpssh_settings
