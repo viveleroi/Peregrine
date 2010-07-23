@@ -48,7 +48,7 @@ class CageBase {
      * Example: this allows the user to combine three-field-phone numbers
  	 * and validate the entire string. 
 	 *
-	 * $p->post->combine('%s%s%s', array('area','prefix','suffix'), 'getDigits'));
+	 * $p->post->combine('%s%s%s', array('area','prefix','suffix'), 'getPhone'));
 	 *
 	 * @param string $str
 	 * @param array $fields
@@ -721,7 +721,7 @@ class CageBase {
 	 * @param string $key
 	 * @param string $format
 	 * @param mixed $default
-	 * @return <type>
+	 * @return string
 	 */
 	public function getDate($key = false, $format = false, $default = NULL){
 		$default = $default === NULL ? false : $default;

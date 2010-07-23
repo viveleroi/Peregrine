@@ -90,8 +90,7 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 	public function test_strlen() {
 		$my_arr = array('test'=>'testing');
 		$arr = Peregrine::sanitize( $my_arr );
-		$this->assertEquals(true, $arr->strlen('test', 7));
-		$this->assertEquals(false, $arr->strlen('test', 8));
+		$this->assertEquals(7, $arr->strlen('test'));
 	}
 
 
@@ -465,8 +464,9 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 		$arr = Peregrine::sanitize( $my_arr );
 		$this->assertEquals('123 Fake Street', $arr->getAddress(0));
 		$this->assertEquals('', $arr->getAddress(1));
-		$this->assertEquals('050 P.0.-BOX CROSS & CROSS', $arr->getAddress(2));
-		$this->assertEquals('', $arr->getAddress(3));
+		$this->assertEquals('', $arr->getAddress(2));
+		$this->assertEquals('050 P.0.-BOX CROSS & CROSS', $arr->getAddress(3));
+		$this->assertEquals('', $arr->getAddress(4));
 	}
 
 
@@ -478,8 +478,9 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 		$arr = Peregrine::sanitize( $my_arr );
 		$this->assertEquals(true, $arr->isAddress(0));
 		$this->assertEquals(false, $arr->isAddress(1));
-		$this->assertEquals(true, $arr->isAddress(2));
-		$this->assertEquals(false, $arr->isAddress(3));
+		$this->assertEquals(false, $arr->isAddress(2));
+		$this->assertEquals(true, $arr->isAddress(3));
+		$this->assertEquals(false, $arr->isAddress(4));
 	}
 
 
