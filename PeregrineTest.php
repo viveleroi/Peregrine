@@ -82,6 +82,17 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(true, $arr->isSetAndNotEmpty('test2'));
 		$this->assertEquals(false, $arr->isSetAndNotEmpty('test3'));
 	}
+	
+	
+	/**
+	 *
+	 */
+	public function test_strlen() {
+		$my_arr = array('test'=>'testing');
+		$arr = Peregrine::sanitize( $my_arr );
+		$this->assertEquals(true, $arr->strlen('test', 7));
+		$this->assertEquals(false, $arr->strlen('test', 8));
+	}
 
 
 	/**
@@ -94,6 +105,19 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(false, $arr->match(1,2));
 		$this->assertEquals(true, $arr->match(0,3));
 		$this->assertEquals(false, $arr->match(0,3, true));
+	}
+	
+	
+	/**
+	 *
+	 */
+	public function test_equals() {
+		$my_arr = array(1,1,'2');
+		$arr = Peregrine::sanitize( $my_arr );
+		$this->assertEquals(true, $arr->equals(0,1));
+		$this->assertEquals(false, $arr->equals(1,2));
+		$this->assertEquals(true, $arr->equals(2,2));
+		$this->assertEquals(false, $arr->equals(2,2,true));
 	}
 	
 
@@ -431,6 +455,32 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(true, $arr->isName(0));
 		$this->assertEquals(false, $arr->isName(1));
 	}
+	
+	
+	/**
+	 *
+	 */
+	public function test_getAddress() {
+		$my_arr = array('123 Fake Street','?','','050 P.0.-BOX CROSS & CROSS', '?^*@!%<>{}[]()');
+		$arr = Peregrine::sanitize( $my_arr );
+		$this->assertEquals('123 Fake Street', $arr->getAddress(0));
+		$this->assertEquals('', $arr->getAddress(1));
+		$this->assertEquals('050 P.0.-BOX CROSS & CROSS', $arr->getAddress(2));
+		$this->assertEquals('', $arr->getAddress(3));
+	}
+
+
+	/**
+	 *
+	 */
+	public function test_isAddress() {
+		$my_arr = array('123 Fake Street','?','','050 P.0.-BOX CROSS & CROSS', '?^*@!%<>{}[]()');
+		$arr = Peregrine::sanitize( $my_arr );
+		$this->assertEquals(true, $arr->isAddress(0));
+		$this->assertEquals(false, $arr->isAddress(1));
+		$this->assertEquals(true, $arr->isAddress(2));
+		$this->assertEquals(false, $arr->isAddress(3));
+	}
 
 
 	/**
@@ -524,9 +574,10 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 	 *
 	 */
 	public function test_getDigits() {
-		$my_arr = array('test'=>'ABC10.123');
+		$my_arr = array('test'=>'ABC10.123','empty'=>'');
 		$arr = Peregrine::sanitize( $my_arr );
 		$this->assertEquals('10123', $arr->getDigits('test'));
+		$this->assertEquals('', $arr->getDigits('empty'));
 		$this->assertEquals(0, $arr->getDigits('nonexist-key', 0));
 	}
 
@@ -535,10 +586,11 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 	 *
 	 */
 	public function test_isDigits() {
-		$my_arr = array('test'=>ALL_CHAR_STRING,'test2'=>123);
+		$my_arr = array('test'=>ALL_CHAR_STRING,'test2'=>123,'empty'=>'');
 		$arr = Peregrine::sanitize( $my_arr );
 		$this->assertEquals(false, $arr->isDigits('test'));
 		$this->assertEquals(true, $arr->isDigits('test2'));
+		$this->assertEquals(false, $arr->isDigits('empty'));
 	}
 
 
