@@ -39,6 +39,42 @@ class CageBase {
 			$this->_raw = $arr;
 		}
 	}
+	
+	
+	/**
+	 * Allows the user to combine fields into a specified printf string
+	 * and then validate the entire string with any Peregrine method.
+	 *
+     * Example: this allows the user to combine three-field-phone numbers
+ 	 * and validate the entire string. 
+	 *
+	 * $p->post->combine('%s%s%s', array('area','prefix','suffix'), 'getDigits'));
+	 *
+	 * @param string $str
+	 * @param array $fields
+	 * @param string $method
+	 * @param array $args
+	 * @access public
+	 */
+	public function combine($str, $fields = array(), $method = false, $args = array()){
+		if(is_array($fields) && $method){
+			// Load raw field values
+			$dirty_fields = array($str);
+			foreach($fields as $field){
+				$dirty_fields[] = $this->getRaw($field);
+			}
+			// Pass them all to the sprintf func and pass the resulting array to a new peregrine
+			// instance, and then return the results of the specific method.
+			$combined = array('combined'=>call_user_func_array('sprintf', $dirty_fields));
+			$p = new Peregrine();
+			$clean = $p->sanitize($combined);
+			// Pass any additional method arguments since certain methods allow for additional
+			// configuration.
+			$args = array_merge(array('combined'),$args);
+			return call_user_func_array(array($clean,$method), $args);
+		}
+		return false;
+	}
 
 
 	/**
@@ -147,41 +183,6 @@ class CageBase {
 	public function getRawSource(){
 		return $this->_raw;
 	}
-	
-	
-	/**
-	 * Allows the user to combine fields into a specified printf string
-	 * and then validate the entire string with any Peregrine method.
-	 *
-     * Example: this allows the user to combine three-field-phone numbers
- 	 * and validate the entire string. 
-	 *
-	 * $p->post->combine('%s%s%s', array('area','prefix','suffix'), 'getDigits'));
-	 *
-	 * @param string $str
-	 * @param array $fields
-	 * @param string $method
-	 * @access public
-	 */
-	public function combine($str, $fields = array(), $method = false, $args = array()){
-		if(is_array($fields) && $method){
-			// Load raw field values
-			$dirty_fields = array($str);
-			foreach($fields as $field){
-				$dirty_fields[] = $this->getRaw($field);
-			}
-			// Pass them all to the sprintf func and pass the resulting array to a new peregrine
-			// instance, and then return the results of the specific method.
-			$combined = array('combined'=>call_user_func_array('sprintf', $dirty_fields));
-			$p = new Peregrine();
-			$clean = $p->sanitize($combined);
-			// Pass any additional method arguments since certain methods allow for additional
-			// configuration.
-			$args = array_merge(array('combined'),$args);
-			return call_user_func_array(array($clean,$method), $args);
-		}
-		return false;
-	}
 
 
 	/***********************************************************
@@ -241,12 +242,26 @@ class CageBase {
 	}
 
 
+	/**
+	 * Checks for the string length of a value
+	 *
+	 * @param string $key
+	 * @return boolean
+	 */
+	public function strlen($key){
+		if ($this->keyExists($key)) {
+			return strlen($this->getRaw($key));
+		}
+		return false;
+	}
+
 
 	/**
-	 * Compare two values
+	 * Compare the valued of two fields
 	 *
 	 * @param string $key_1
 	 * @param string $key_2
+	 * @param boolean $strict
 	 * @return boolean
 	 */
 	public function match($key_1, $key_2, $strict = false){
@@ -255,6 +270,26 @@ class CageBase {
 				return $this->getRaw($key_1) === $this->getRaw($key_2);
 			} else {
 				return $this->getRaw($key_1) == $this->getRaw($key_2);
+			}
+		}
+		return false;
+	}
+	
+	
+	/**
+	 * Compare two values
+	 *
+	 * @param string $key_1
+	 * @param mixed $value
+	 * @param boolean $strict
+	 * @return boolean
+	 */
+	public function equals($key, $value, $strict = false){
+		if ($this->keyExists($key)) {
+			if($strict){
+				return $this->getRaw($key) === $value;
+			} else {
+				return $this->getRaw($key) == $value;
 			}
 		}
 		return false;
@@ -565,6 +600,22 @@ class CageBase {
 		}
 		return $default;
 	}
+	
+	
+	/**
+	 * Returns a string of characters allowed within addresses
+	 *
+	 * @param string $key
+	 * @param string $default
+	 * @return string
+	 */
+	public function getAddress($key = false, $default = NULL){
+		$default = $default === NULL ? false : $default;
+		if($this->isSetAndNotEmpty($key)){
+			return preg_replace('/[^a-zA-Z0-9-[:space:]\.\'#&]/', '', $this->getKey($key));
+		}
+		return $default;
+	}
 
 
 	/**
@@ -611,7 +662,7 @@ class CageBase {
 	 */
 	public function getDigits($key = false, $default = NULL){
 		$default = $default === NULL ? false : $default;
-		if($this->keyExists($key)){
+		if($this->keyExists($key) && !$this->equals($key, '', true)){
 			// We need to mimic the type back to the user that they gave us
 			$type = gettype($this->getKey($key));
 			$clean = preg_replace('/[^\d]/', '', $this->getKey($key));
@@ -633,7 +684,7 @@ class CageBase {
 	 */
 	public function getFloat($key = false, $default = NULL){
 		$default = $default === NULL ? false : $default;
-		if($this->keyExists($key)){
+		if($this->keyExists($key) && !$this->equals($key, '', true)){
 			// We need to mimic the type back to the user that they gave us
 			$type = gettype($this->getKey($key));
 			$clean = preg_replace('/[^\d\.]/', '', $this->getKey($key));
@@ -654,7 +705,7 @@ class CageBase {
 	 */
 	public function getCurrency($key = false, $default = NULL){
 		$default = $default === NULL ? false : $default;
-		if($this->keyExists($key)){
+		if($this->keyExists($key) && !$this->equals($key, '', true)){
 			// We need to mimic the type back to the user that they gave us
 			$type = gettype($this->getKey($key));
 			$clean = preg_replace('/[^\d\.,\$]/', '', $this->getKey($key));
@@ -696,7 +747,7 @@ class CageBase {
 		$default = $default === NULL ? false : $default;
 		if($this->isSetAndNotEmpty($key)){
 			preg_match('/(^\d{5}$)|(^\d{5}-\d{4}$)/', $this->getDigits($key), $matches);
-			if(is_array($matches)){
+			if(is_array($matches) && !empty($matches)){
 				return $matches[0];
 			}
 		}
@@ -896,7 +947,7 @@ class Peregrine {
 
 //		$tmp = $this->sanitize($_SESSION);
 		// don't call sanitize because it nulls out SESSION
-		$tmp = new CageBase($_SESSION);
+		$tmp = isset($_SESSION) ? new CageBase($_SESSION) : false;
 //		$GLOBALS['HTTP_SESSION_VARS'] = NULL;
 		$this->session = $tmp;
 	}
