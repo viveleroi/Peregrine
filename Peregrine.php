@@ -456,7 +456,9 @@ class CageBase {
 					959, 970, 971, 972, 973, 978, 979, 980,
 					985, 989);
 
-				return in_array( substr($val, 0, 3), $areaCodes);
+				if(in_array(substr($val, 0, 3), $areaCodes) && substr($val, 3, 6) != '000' && substr($val, 3, 6) != '555'){
+					return true;
+				}
 				break;
 			default:
 				return false;
