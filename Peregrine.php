@@ -831,6 +831,24 @@ class CageBase {
 		}
 		return $default;
 	}
+	
+	
+	/**
+	 * Returns a phone number if it passes, with an optional strip argument
+	 * allowing the user to return the digits only (for use with db storage)
+	 *
+	 * @param string $key
+	 * @param boolean $strip
+	 * @param string $default
+	 * @return mixed
+	 */
+	public function getPhone($key = false, $strip = false, $default = NULL){
+		$default = $default === NULL ? false : $default;
+		if($this->isSetAndNotEmpty($key)){
+			return $this->isPhone($key) ? ($strip ? $this->getDigits($key) : $this->getKey($key)) : $default;
+		}
+		return $default;	
+	}
 }
 
 

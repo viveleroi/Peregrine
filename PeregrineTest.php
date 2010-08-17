@@ -196,13 +196,14 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 	 *
 	 */
 	public function test_isEmail() {
-		$my_arr = array('test','test@','test@test','fake@test.com','test+test@test.com');
+		$my_arr = array('test','test@','test@test','fake@test.com','test+test@test.com','	bob@bob.com');
 		$arr = Peregrine::sanitize( $my_arr );
 		$this->assertEquals(false, $arr->isEmail(0));
 		$this->assertEquals(false, $arr->isEmail(1));
 		$this->assertEquals(false, $arr->isEmail(2));
 		$this->assertEquals(true, $arr->isEmail(3));
 		$this->assertEquals(true, $arr->isEmail(4));
+		$this->assertEquals(false, $arr->getEmail(5));
 	}
 
 
@@ -210,7 +211,7 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 	 *
 	 */
 	public function test_getEmail() {
-		$my_arr = array('test','test@','test@test','fake@test.com','test+test@test.com','');
+		$my_arr = array('test','test@','test@test','fake@test.com','test+test@test.com','	bob@bob.com');
 		$arr = Peregrine::sanitize( $my_arr );
 		$this->assertEquals(false, $arr->getEmail(0));
 		$this->assertEquals(false, $arr->getEmail(1));
@@ -218,6 +219,7 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('fake@test.com', $arr->getEmail(3));
 		$this->assertEquals('test+test@test.com', $arr->getEmail(4));
 		$this->assertEquals(false, $arr->getEmail(5));
+		$this->assertEquals(false, $arr->getEmail(6));
 	}
 
 
@@ -273,10 +275,11 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 	 *
 	 */
 	public function test_isPhone() {
-		$my_arr = array('503AAAA','5031239999');
+		$my_arr = array('503AAAA','5031239999','(503) 123-4567');
 		$arr = Peregrine::sanitize( $my_arr );
 		$this->assertEquals(false, $arr->isPhone(0));
 		$this->assertEquals(true, $arr->isPhone(1));
+		$this->assertEquals(true, $arr->isPhone(2));
 	}
 
 
@@ -284,11 +287,13 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 	 *
 	 */
 	public function test_getPhone() {
-		$my_arr = array('503AAAA','5031239999','');
+		$my_arr = array('503AAAA','5031239999','','(503) 123-4567');
 		$arr = Peregrine::sanitize( $my_arr );
 		$this->assertEquals(false, $arr->getPhone(0));
 		$this->assertEquals('5031239999', $arr->getPhone(1));
 		$this->assertEquals(false, $arr->getPhone(2));
+		$this->assertEquals('(503) 123-4567', $arr->getPhone(3));
+		$this->assertEquals('5031234567', $arr->getPhone(3, true));
 	}
 
 
@@ -817,7 +822,6 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals(false, $arr->isArray(1));
 		$this->assertEquals(false, $arr->isArray(2));
 	}
-
 
 
 	/***********************************************************
