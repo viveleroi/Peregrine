@@ -465,13 +465,14 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 	 *
 	 */
 	public function test_getAddress() {
-		$my_arr = array('123 Fake Street','?','','050 P.0.-BOX CROSS & CROSS', '?^*@!%<>{}[]()');
+		$my_arr = array('123 Fake Street','?','','050 P.0.-BOX CROSS & CROSS', '?^*@!%<>{}[]()','BOX A, BOX B');
 		$arr = Peregrine::sanitize( $my_arr );
 		$this->assertEquals('123 Fake Street', $arr->getAddress(0));
 		$this->assertEquals('', $arr->getAddress(1));
 		$this->assertEquals('', $arr->getAddress(2));
 		$this->assertEquals('050 P.0.-BOX CROSS & CROSS', $arr->getAddress(3));
 		$this->assertEquals('', $arr->getAddress(4));
+		$this->assertEquals('BOX A, BOX B', $arr->getAddress(5));
 	}
 
 
@@ -479,13 +480,14 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 	 *
 	 */
 	public function test_isAddress() {
-		$my_arr = array('123 Fake Street','?','','050 P.0.-BOX CROSS & CROSS', '?^*@!%<>{}[]()');
+		$my_arr = array('123 Fake Street','?','','050 P.0.-BOX CROSS & CROSS', '?^*@!%<>{}[]()','BOX A, BOX B');
 		$arr = Peregrine::sanitize( $my_arr );
 		$this->assertEquals(true, $arr->isAddress(0));
 		$this->assertEquals(false, $arr->isAddress(1));
 		$this->assertEquals(false, $arr->isAddress(2));
 		$this->assertEquals(true, $arr->isAddress(3));
 		$this->assertEquals(false, $arr->isAddress(4));
+		$this->assertEquals(true, $arr->isAddress(5));
 	}
 
 

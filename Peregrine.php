@@ -614,7 +614,7 @@ class CageBase {
 	public function getAddress($key = false, $default = NULL){
 		$default = $default === NULL ? false : $default;
 		if($this->isSetAndNotEmpty($key)){
-			return preg_replace('/[^a-zA-Z0-9-[:space:]\.\'#&]/', '', $this->getKey($key));
+			return preg_replace('/[^a-zA-Z0-9-[:space:]\.\'#,&]/', '', $this->getKey($key));
 		}
 		return $default;
 	}
