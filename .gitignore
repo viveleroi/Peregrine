@@ -2,5 +2,5 @@ nbproject
 .DS_Store
 *.tmproj
 .ftpssh_settings
-build/latest
-build/*.gz
+Capfile
+config/*
