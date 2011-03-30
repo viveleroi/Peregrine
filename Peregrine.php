@@ -210,12 +210,33 @@ class CageBase {
 		} else {
 			$val = $this->getRaw($key);
 			if(is_array($val)){
-				$val = implode('',$val);
+				$val = $this->multi_implode('',$val);
 			}
 			$val = $count_as_empty ? str_replace($count_as_empty, '', $val) : $val;
 			$val = trim($val);
 			return empty($val);
 		}
+	}
+	
+	
+	/**
+	 * Implodes a multi-dimensional array, which is useful for
+	 * checking if the array contains any data, at any point.
+	 * @param string $glue
+	 * @param array $pieces
+	 * @return string 
+	 */
+	protected function multi_implode($glue, $pieces){
+		$string='';
+		if(is_array($pieces)){
+			reset($pieces);
+			while(list($key,$value)=each($pieces)){
+				$string.=$glue.$this->multi_implode($glue, $value);
+			}
+		} else {
+			return $pieces;
+		}
+		return trim($string, $glue);
 	}
 
 
