@@ -193,7 +193,8 @@ class CageBase {
 	/**
 	 * Determines whether or not a value is empty. You may provide
 	 * an array of additional characters that should be counted as
-	 * empty values.
+	 * empty values. Arrays are imploded and checked for empty values
+	 * so array('') will be caught.
 	 *
 	 * Empty returns true if the key does not exist at all.
 	 *
@@ -208,7 +209,11 @@ class CageBase {
 			return true;
 		} else {
 			$val = $this->getRaw($key);
+			if(is_array($val)){
+				$val = implode('',$val);
+			}
 			$val = $count_as_empty ? str_replace($count_as_empty, '', $val) : $val;
+			$val = trim($val);
 			return empty($val);
 		}
 	}
@@ -664,7 +669,7 @@ class CageBase {
 	 */
 	public function getDigits($key = false, $default = NULL){
 		$default = $default === NULL ? false : $default;
-		if($this->keyExists($key) && !$this->equals($key, '', true)){
+		if($this->keyExists($key) && !$this->equals($key, '', true) && !$this->equals($key, NULL, true)){
 			// We need to mimic the type back to the user that they gave us
 			$type = gettype($this->getKey($key));
 			$clean = preg_replace('/[^\d]/', '', $this->getKey($key));
@@ -686,7 +691,7 @@ class CageBase {
 	 */
 	public function getFloat($key = false, $default = NULL){
 		$default = $default === NULL ? false : $default;
-		if($this->keyExists($key) && !$this->equals($key, '', true)){
+		if($this->keyExists($key) && !$this->equals($key, '', true) && !$this->equals($key, NULL, true)){
 			// We need to mimic the type back to the user that they gave us
 			$type = gettype($this->getKey($key));
 			$clean = preg_replace('/[^\d\.]/', '', $this->getKey($key));
@@ -707,7 +712,7 @@ class CageBase {
 	 */
 	public function getCurrency($key = false, $default = NULL){
 		$default = $default === NULL ? false : $default;
-		if($this->keyExists($key) && !$this->equals($key, '', true)){
+		if($this->keyExists($key) && !$this->equals($key, '', true) && !$this->equals($key, NULL, true)){
 			// We need to mimic the type back to the user that they gave us
 			$type = gettype($this->getKey($key));
 			$clean = preg_replace('/[^\d\.,\$]/', '', $this->getKey($key));

@@ -51,12 +51,13 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 	 *
 	 */
 	public function test_isEmpty() {
-		$my_arr = array('test'=>0,'test2'=>'full');
+		$my_arr = array('test'=>0,'test2'=>'full','arr'=>array(''));
 		$arr = Peregrine::sanitize( $my_arr );
 		$this->assertEquals(true, $arr->isEmpty('test'));
 		$this->assertEquals(false, $arr->isEmpty('test2'));
 		$this->assertEquals(true, $arr->isEmpty('fake'));
 		$this->assertEquals(true, $arr->isEmpty('test2','full')); // count "full" as empty
+		$this->assertEquals(true, $arr->isEmpty('arr'));
 	}
 
 
