@@ -676,9 +676,8 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 	public function test_isDate() {
 		$my_arr = array('January 12, 2009','Mon, 12 Jan 09 00:00:00 -0800');
 		$arr = Peregrine::sanitize( $my_arr );
-		$this->assertEquals(false, $arr->isDate(0));
+		$this->assertEquals(true, $arr->isDate(0,'Mdy'));
 		$this->assertEquals(true, $arr->isDate(1));
-		$this->assertEquals(false, $arr->isDate(0));
 	}
 
 
@@ -690,7 +689,7 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 		$arr = Peregrine::sanitize( $my_arr );
 		$this->assertEquals('12345', $arr->getZip(0));
 		$this->assertEquals('12345', $arr->getZip(1));
-		$this->assertEquals('12345', $arr->getFloat('nonexist-key', '12345'));
+		$this->assertEquals('12345', $arr->getZip('nonexist-key', '12345'));
 		$this->assertEquals(false, $arr->getZip(2));
 	}
 
@@ -703,6 +702,83 @@ class PeregrineTest extends PHPUnit_Framework_TestCase {
 		$arr = Peregrine::sanitize( $my_arr );
 		$this->assertEquals(true, $arr->isZip(0));
 		$this->assertEquals(false, $arr->isZip(1));
+	}
+	
+	
+	/**
+	 *
+	 */
+	public function test_getSsn() {
+		$my_arr = array('12345','520645555','520 64 5555','520-64-5555');
+		$arr = Peregrine::sanitize( $my_arr );
+		$this->assertEquals('', $arr->getSsn(0));
+		$this->assertEquals('520645555', $arr->getSsn(1));
+		$this->assertEquals('12345', $arr->getSsn('nonexist-key', '12345'));
+		$this->assertEquals('520645555', $arr->getSsn(2));
+		$this->assertEquals('520645555', $arr->getSsn(3));
+	}
+
+	
+	/**
+	 *
+	 */
+	public function test_isSsn() {
+		$my_arr = array('12345','520645555','520 64 5555','520-64-5555');
+		$arr = Peregrine::sanitize( $my_arr );
+		$this->assertEquals(false, $arr->isSsn(0));
+		$this->assertEquals(true, $arr->isSsn(1));
+		$this->assertEquals(true, $arr->isSsn(2));
+		$this->assertEquals(true, $arr->isSsn(3));
+	}
+	
+	
+	/**
+	 *
+	 */
+	public function test_getUuid() {
+		$my_arr = array('12345','ae91e300-76a6-11e0-a1f0-0800200c9a66','ae91e30076a611e0a1f00800200c9a66');
+		$arr = Peregrine::sanitize( $my_arr );
+		$this->assertEquals('', $arr->getUuid(0));
+		$this->assertEquals('ae91e300-76a6-11e0-a1f0-0800200c9a66', $arr->getUuid(1));
+		$this->assertEquals('', $arr->getUuid(2));
+	}
+
+	
+	/**
+	 *
+	 */
+	public function test_isUuid() {
+		$my_arr = array('12345','ae91e300-76a6-11e0-a1f0-0800200c9a66','ae91e30076a611e0a1f00800200c9a66');
+		$arr = Peregrine::sanitize( $my_arr );
+		$this->assertEquals(false, $arr->isUuid(0));
+		$this->assertEquals(true, $arr->isUuid(1));
+		$this->assertEquals(false, $arr->isUuid(2));
+	}
+	
+	
+	/**
+	 *
+	 */
+	public function test_getTime() {
+		$my_arr = array('12345','12:00','00:00','00:00pm');
+		$arr = Peregrine::sanitize( $my_arr );
+		$this->assertEquals('', $arr->getTime(0));
+		$this->assertEquals('12:00', $arr->getTime(1));
+		$this->assertEquals('00:00', $arr->getTime(2));
+		$this->assertEquals('', $arr->getTime(3));
+	}
+
+	
+	/**
+	 *
+	 */
+	public function test_isTime() {
+		$my_arr = array('12345','12:00','00:00','00:00pm');
+		$arr = Peregrine::sanitize( $my_arr );
+		$this->assertEquals(false, $arr->isTime(0));
+		$this->assertEquals(true, $arr->isTime(1));
+		$this->assertEquals(true, $arr->isTime(2));
+		$this->assertEquals(false, $arr->isTime(3));
 	}
 
 
