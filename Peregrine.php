@@ -990,6 +990,24 @@ class CageBase {
 		}
 		return $default;	
 	}
+	
+	
+	
+	/**
+	 * Returns data formatted to a custom expression
+	 * 
+	 * @param type $key
+	 * @param type $regex
+	 * @param type $default
+	 * @return type mixed
+	 */
+	public function getCustom($key = false, $regex = false, $default = NULL){
+		$default = $default === NULL ? false : $default;
+		if($this->isSetAndNotEmpty($key) && $regex){
+			return preg_replace($regex, '', $this->getKey($key));
+		}
+		return $default;
+	}
 }
 
 
