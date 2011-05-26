@@ -721,6 +721,22 @@ class CageBase {
 	
 	
 	/**
+	 * Returns an acceptable username string
+	 *
+	 * @param string $key
+	 * @param string $default
+	 * @return string
+	 */
+	public function getUsername($key = false, $default = NULL){
+		$default = $default === NULL ? false : $default;
+		if($this->isSetAndNotEmpty($key)){
+			return preg_replace('/[^a-zA-Z0-9-_\.]/', '', $this->getKey($key));
+		}
+		return $default;
+	}
+	
+	
+	/**
 	 * Returns a string of characters allowed within addresses
 	 *
 	 * @param string $key
